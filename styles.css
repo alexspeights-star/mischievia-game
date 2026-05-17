@@ -485,6 +485,19 @@ body {
   font-size: 18px;
 }
 
+#mischievia-game .mg-music-btn {
+  position: absolute;
+  z-index: 10;
+  right: 72px;
+  top: 18px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.35);
+  font-size: 18px;
+  transition: opacity .2s ease, transform .2s ease;
+}
+
 /* =====================================================================
    PANEL / FORMS
    ===================================================================== */
@@ -655,6 +668,43 @@ body {
 #mischievia-game .mg-party-options {
   width: min(400px, 100%);
   margin-bottom: 18px;
+}
+
+#mischievia-game .mg-vol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 140px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.15);
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+#mischievia-game .mg-vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255,106,0,.4);
+}
+
+#mischievia-game .mg-vol-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  border: none;
+  cursor: pointer;
+}
+
+#mischievia-game .mg-vol-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, var(--orange) 0%, rgba(255,255,255,.12) 0%);
+  border-radius: 999px;
+  height: 6px;
 }
 
 /* =====================================================================

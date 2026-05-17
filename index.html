@@ -20,6 +20,7 @@
     </div>
 
     <div class="mg-fx-layer" id="mgFxLayer"></div>
+    <button class="mg-icon-btn mg-music-btn" id="mgMusicToggle" aria-label="Toggle music">🎵</button>
     <button class="mg-icon-btn mg-mute" id="mgMute" aria-label="Toggle sound">🔊</button>
 
     <!-- START SCREEN -->
@@ -86,6 +87,14 @@
           <label class="mg-setting-row">
             <span>Sound effects</span>
             <button class="mg-toggle" id="settingSound" data-on="true">ON</button>
+          </label>
+          <label class="mg-setting-row">
+            <span>Background music</span>
+            <button class="mg-toggle" id="settingMusic" data-on="true">ON</button>
+          </label>
+          <label class="mg-setting-row">
+            <span>Music volume</span>
+            <input type="range" class="mg-vol-slider" id="settingMusicVol" min="0" max="100" value="30" />
           </label>
           <label class="mg-setting-row">
             <span>Animations</span>
