@@ -1,0 +1,1665 @@
+/* MISCHIEVIA — all selectors scoped under #mischievia-game for Squarespace safety */
+
+:root { color-scheme: dark; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #050407;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+/* =====================================================================
+   ROOT VARIABLES & CONTAINER
+   ===================================================================== */
+
+#mischievia-game {
+  --cream: #fff1cf;
+  --cream-soft: rgba(255, 241, 207, 0.82);
+  --gold: #ffc857;
+  --orange: #ff6a00;
+  --red: #ff2f5f;
+  --blue: #3ee4ff;
+  --green: #4fffb0;
+  --deep: #07040b;
+  --purple: #23102f;
+  --panel: rgba(10, 7, 18, 0.82);
+  --panel-solid: #110918;
+  --line: rgba(255, 255, 255, 0.14);
+  --line-bright: rgba(255, 255, 255, 0.26);
+  --shadow: rgba(0, 0, 0, 0.6);
+
+  position: relative;
+  width: min(1180px, 100%);
+  min-height: 820px;
+  overflow: hidden;
+  border-radius: 32px;
+  color: var(--cream);
+  background:
+    radial-gradient(circle at 16% 36%, rgba(62, 228, 255, 0.22), transparent 34%),
+    radial-gradient(circle at 84% 38%, rgba(255, 47, 95, 0.19), transparent 32%),
+    radial-gradient(circle at 50% 100%, rgba(255, 106, 0, 0.17), transparent 38%),
+    linear-gradient(135deg, #030206, #16081f 48%, #070309);
+  box-shadow: 0 30px 90px var(--shadow), 0 0 0 1px rgba(255,255,255,0.05);
+  isolation: isolate;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", system-ui, sans-serif;
+}
+
+#mischievia-game * { box-sizing: border-box; }
+#mischievia-game button, #mischievia-game input, #mischievia-game select { font: inherit; }
+
+/* =====================================================================
+   BACKGROUND LAYERS
+   ===================================================================== */
+
+#mischievia-game .mg-bg,
+#mischievia-game .mg-orb,
+#mischievia-game .mg-particles,
+#mischievia-game .mg-grid,
+#mischievia-game .mg-embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#mischievia-game .mg-bg { z-index: -5; }
+
+#mischievia-game .mg-orb {
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(88px);
+  opacity: 0.75;
+  animation: mgPulse 7s ease-in-out infinite alternate;
+}
+
+#mischievia-game .mg-orb-blue {
+  background: rgba(62, 228, 255, 0.38);
+  left: -160px;
+  top: 100px;
+}
+
+#mischievia-game .mg-orb-red {
+  background: rgba(255, 70, 0, 0.38);
+  right: -150px;
+  top: 100px;
+  animation-delay: -3s;
+}
+
+#mischievia-game .mg-particles {
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.6) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,106,0,.7) 0 1px, transparent 3px),
+    radial-gradient(circle, rgba(62,228,255,.65) 0 1px, transparent 2px);
+  background-size: 110px 110px, 160px 160px, 210px 210px;
+  animation: mgDrift 20s linear infinite;
+  opacity: .4;
+}
+
+#mischievia-game .mg-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: perspective(700px) rotateX(62deg) translateY(220px) scale(1.4);
+  opacity: .16;
+}
+
+#mischievia-game .mg-ember {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--orange);
+  animation: mgEmberRise linear infinite;
+  opacity: 0;
+}
+
+/* =====================================================================
+   SCREEN SYSTEM
+   ===================================================================== */
+
+#mischievia-game .mg-screen {
+  display: none;
+  min-height: 820px;
+  padding: clamp(20px, 4vw, 52px);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  position: relative;
+  gap: 0;
+}
+
+#mischievia-game .mg-screen.active {
+  display: flex;
+  animation: mgScreenIn .32s ease-out both;
+}
+
+/* =====================================================================
+   SHARED CARD SURFACES
+   ===================================================================== */
+
+#mischievia-game .mg-logo-card,
+#mischievia-game .mg-panel,
+#mischievia-game .mg-card,
+#mischievia-game .mg-reveal-card {
+  background: linear-gradient(180deg, rgba(35, 16, 47, .85), rgba(5, 4, 9, .92));
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 70px rgba(0,0,0,.52), inset 0 0 40px rgba(255,255,255,.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+#mischievia-game .mg-card::before,
+#mischievia-game .mg-reveal-card::before,
+#mischievia-game .mg-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(62,228,255,.1), transparent 38%, rgba(255,106,0,.11));
+  pointer-events: none;
+}
+
+/* =====================================================================
+   LOGO / START SCREEN
+   ===================================================================== */
+
+#mischievia-game .mg-logo-card {
+  position: relative;
+  width: min(680px, 100%);
+  padding: clamp(22px, 4vw, 44px);
+  border-radius: 30px;
+  transform: rotate(-1.5deg);
+  margin-bottom: 28px;
+}
+
+#mischievia-game .mg-logo-card::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid rgba(255, 200, 87, .32);
+  filter: drop-shadow(0 0 18px rgba(255,200,87,.42));
+  pointer-events: none;
+}
+
+#mischievia-game .mg-halo {
+  width: 160px;
+  height: 42px;
+  border: 7px solid rgba(255, 200, 87, .9);
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  transform: perspective(260px) rotateX(58deg);
+  box-shadow: 0 0 22px rgba(255, 200, 87, .5);
+  animation: mgFloatSoft 3.5s ease-in-out infinite;
+}
+
+#mischievia-game .mg-horns {
+  position: absolute;
+  right: 28px;
+  top: 18px;
+  color: var(--red);
+  font-size: 60px;
+  transform: rotate(20deg);
+  text-shadow: 0 0 18px rgba(255, 47, 95, .7);
+}
+
+#mischievia-game h1 {
+  margin: 0;
+  font-size: clamp(58px, 12vw, 136px);
+  line-height: .78;
+  letter-spacing: -4px;
+  color: var(--gold);
+  text-shadow:
+    0 5px 0 #7a2400,
+    0 0 14px rgba(255, 200, 87, .44),
+    0 0 44px rgba(255, 106, 0, .4);
+}
+
+#mischievia-game h2 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 5.5vw, 64px);
+  line-height: .92;
+  color: var(--cream);
+  text-shadow: 0 0 22px rgba(255,255,255,.12);
+}
+
+#mischievia-game h3 {
+  margin: 0 0 10px;
+  font-size: clamp(20px, 3.5vw, 36px);
+  color: var(--gold);
+}
+
+#mischievia-game .mg-subtitle {
+  margin: 14px 0 0;
+  font-size: clamp(24px, 5vw, 54px);
+  color: white;
+  letter-spacing: .02em;
+  text-shadow: 0 0 26px rgba(62,228,255,.36);
+}
+
+/* =====================================================================
+   TYPOGRAPHY UTILITIES
+   ===================================================================== */
+
+#mischievia-game .mg-kicker {
+  margin: 0 0 10px;
+  color: var(--blue);
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: .18em;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+#mischievia-game .mg-tagline {
+  max-width: 620px;
+  margin: 0 auto 28px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 2vw, 19px);
+  line-height: 1.55;
+  color: var(--cream-soft);
+}
+
+#mischievia-game .mg-muted {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 17px);
+  color: rgba(255, 241, 207, .6);
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+/* =====================================================================
+   MODE GRID (START SCREEN)
+   ===================================================================== */
+
+#mischievia-game .mg-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: min(560px, 100%);
+  margin-bottom: 20px;
+}
+
+#mischievia-game .mg-mode-btn {
+  background: linear-gradient(180deg, rgba(35,16,47,.9), rgba(10,6,18,.95));
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: clamp(18px, 3vw, 28px) 16px;
+  color: var(--cream);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#mischievia-game .mg-mode-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .2s ease;
+  background: radial-gradient(circle at center, rgba(255,200,87,.14), transparent 65%);
+}
+
+#mischievia-game .mg-mode-btn:hover::before,
+#mischievia-game .mg-mode-btn:focus::before { opacity: 1; }
+
+#mischievia-game .mg-mode-btn:hover,
+#mischievia-game .mg-mode-btn:focus {
+  transform: translateY(-3px);
+  border-color: rgba(255, 200, 87, .5);
+  box-shadow: 0 16px 36px rgba(0,0,0,.4), 0 0 22px rgba(255,200,87,.12);
+  outline: none;
+}
+
+#mischievia-game .mg-mode-icon {
+  font-size: clamp(28px, 5vw, 38px);
+  line-height: 1;
+}
+
+#mischievia-game .mg-mode-btn strong {
+  font-size: clamp(13px, 2vw, 16px);
+  letter-spacing: .06em;
+  color: var(--gold);
+}
+
+#mischievia-game .mg-mode-btn small {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--cream-soft);
+  letter-spacing: .04em;
+}
+
+#mischievia-game .mg-mode-hot { border-color: rgba(255, 106, 0, .28); }
+#mischievia-game .mg-mode-party { border-color: rgba(255, 47, 95, .28); }
+
+#mischievia-game .mg-rank-peek {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--gold);
+  opacity: .7;
+  min-height: 20px;
+}
+
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+
+#mischievia-game .mg-btn,
+#mischievia-game .mg-powerup,
+#mischievia-game .mg-icon-btn {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  color: var(--cream);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+#mischievia-game .mg-btn {
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 13px 26px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-size: clamp(13px, 1.8vw, 16px);
+}
+
+#mischievia-game .mg-primary {
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  color: #140604;
+  border-color: transparent;
+  box-shadow: 0 12px 28px rgba(255,106,0,.3);
+}
+
+#mischievia-game .mg-secondary {
+  background: rgba(255,255,255,.08);
+}
+
+#mischievia-game .mg-btn:hover,
+#mischievia-game .mg-powerup:hover,
+#mischievia-game .mg-icon-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(62,228,255,.14), 0 0 20px rgba(255,106,0,.14);
+  border-color: rgba(255, 200, 87, .5);
+}
+
+#mischievia-game .mg-btn:focus,
+#mischievia-game .mg-powerup:focus,
+#mischievia-game .mg-icon-btn:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+#mischievia-game .mg-btn:disabled {
+  opacity: .38;
+  pointer-events: none;
+}
+
+#mischievia-game .mg-back-btn {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 0;
+  letter-spacing: .06em;
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+#mischievia-game .mg-add-btn {
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 12px 20px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  background: linear-gradient(135deg, var(--blue), #00a8cc);
+  color: #040b0e;
+  border-color: transparent;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+#mischievia-game .mg-mute {
+  position: absolute;
+  z-index: 10;
+  right: 18px;
+  top: 18px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.35);
+  font-size: 18px;
+}
+
+/* =====================================================================
+   PANEL / FORMS
+   ===================================================================== */
+
+#mischievia-game .mg-panel {
+  position: relative;
+  width: min(720px, 100%);
+  border-radius: 28px;
+  padding: clamp(22px, 4vw, 42px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+#mischievia-game .mg-input {
+  width: min(400px, 100%);
+  height: 56px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.38);
+  color: var(--cream);
+  text-align: center;
+  padding: 0 20px;
+  margin: 8px auto 18px;
+  display: block;
+  outline: none;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+#mischievia-game .mg-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 22px rgba(62,228,255,.2);
+}
+
+#mischievia-game .mg-input-inline {
+  width: 100%;
+  margin: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+#mischievia-game .mg-player-add-row {
+  display: flex;
+  width: min(400px, 100%);
+  margin: 0 auto 18px;
+  gap: 0;
+}
+
+#mischievia-game .mg-player-add-row .mg-add-btn {
+  border-radius: 0 999px 999px 0;
+  border-left: none;
+}
+
+#mischievia-game .mg-player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#mischievia-game .mg-player-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  animation: mgScreenIn .22s ease-out both;
+}
+
+#mischievia-game .mg-player-item .mg-player-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  background: linear-gradient(135deg, var(--blue), var(--gold));
+  color: #060412;
+  flex-shrink: 0;
+}
+
+#mischievia-game .mg-player-item .mg-player-remove {
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background .14s;
+}
+
+#mischievia-game .mg-player-item .mg-player-remove:hover {
+  background: rgba(255,47,95,.15);
+}
+
+/* =====================================================================
+   SELECT / SETTINGS
+   ===================================================================== */
+
+#mischievia-game .mg-select {
+  background: rgba(0,0,0,.4);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--cream);
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+#mischievia-game .mg-settings-list {
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+#mischievia-game .mg-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#mischievia-game .mg-toggle {
+  background: rgba(255,255,255,.1);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--cream);
+  cursor: pointer;
+  transition: background .16s, border-color .16s;
+}
+
+#mischievia-game .mg-toggle[data-on="true"] {
+  background: linear-gradient(135deg, rgba(62,228,255,.25), rgba(62,228,255,.1));
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+#mischievia-game .mg-party-options {
+  width: min(400px, 100%);
+  margin-bottom: 18px;
+}
+
+/* =====================================================================
+   HUD (GAME SCREEN)
+   ===================================================================== */
+
+#mischievia-game .mg-hud {
+  width: min(900px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+#mischievia-game .mg-hud-item {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,.26);
+  text-align: left;
+}
+
+#mischievia-game .mg-hud-item span,
+#mischievia-game .mg-card-top span {
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 3px;
+}
+
+#mischievia-game .mg-hud-item strong {
+  font-size: clamp(16px, 2.8vw, 24px);
+  color: var(--cream);
+}
+
+/* =====================================================================
+   MISCHIEF METER
+   ===================================================================== */
+
+#mischievia-game .mg-meter-block {
+  width: min(900px, 100%);
+  margin-bottom: 12px;
+}
+
+#mischievia-game .mg-meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--cream-soft);
+  margin-bottom: 6px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+#mischievia-game .mg-meter {
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: rgba(0,0,0,.4);
+}
+
+#mischievia-game .mg-meter-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--gold), var(--red));
+  box-shadow: 0 0 16px rgba(255,106,0,.4);
+  transition: width .55s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* =====================================================================
+   POWERUPS
+   ===================================================================== */
+
+#mischievia-game .mg-powerups {
+  width: min(900px, 100%);
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+#mischievia-game .mg-powerup {
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  background: rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: .04em;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+}
+
+#mischievia-game .mg-power-label { display: inline; }
+
+#mischievia-game .mg-power-count {
+  background: rgba(0,0,0,.4);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 10px;
+  color: var(--gold);
+}
+
+#mischievia-game .mg-powerup.used,
+#mischievia-game .mg-option.removed {
+  opacity: .25;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+#mischievia-game .mg-powerup.activating {
+  animation: mgPowerActivate .4s ease-out both;
+}
+
+#mischievia-game .mg-double-active {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--orange);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin: -4px 0 8px;
+  animation: mgPulseText 1.2s ease-in-out infinite;
+  border: 1px solid rgba(255,106,0,.4);
+  border-radius: 999px;
+  padding: 6px 18px;
+  background: rgba(255,106,0,.08);
+}
+
+/* =====================================================================
+   GAME CARD
+   ===================================================================== */
+
+#mischievia-game .mg-card {
+  width: min(900px, 100%);
+  border-radius: 28px;
+  padding: clamp(18px, 3.5vw, 38px);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  animation: mgCardIn .38s ease-out both;
+}
+
+#mischievia-game .mg-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+#mischievia-game .mg-badge {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: rgba(62,228,255,.1);
+  border: 1px solid rgba(62,228,255,.3);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+#mischievia-game .mg-badge-hot {
+  color: var(--orange);
+  background: rgba(255,106,0,.1);
+  border-color: rgba(255,106,0,.35);
+}
+
+#mischievia-game .mg-progress {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--cream-soft);
+  letter-spacing: .06em;
+}
+
+#mischievia-game .mg-card h2 {
+  margin-bottom: 16px;
+  font-size: clamp(24px, 4vw, 46px);
+}
+
+#mischievia-game .mg-card p {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 1.9vw, 20px);
+  line-height: 1.55;
+  margin: 0 0 22px;
+  color: rgba(255, 241, 207, .92);
+}
+
+/* =====================================================================
+   ANSWER OPTIONS
+   ===================================================================== */
+
+#mischievia-game .mg-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#mischievia-game .mg-option {
+  min-height: 88px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(0,0,0,.34);
+  color: var(--cream);
+  text-align: left;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: start;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#mischievia-game .mg-option:hover {
+  transform: translateY(-3px) rotate(-.4deg);
+  border-color: rgba(255, 200, 87, .55);
+  background: rgba(255,255,255,.09);
+  box-shadow: 0 12px 26px rgba(0,0,0,.28);
+}
+
+#mischievia-game .mg-option:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+#mischievia-game .mg-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--blue), var(--gold));
+  color: #12050a;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+#mischievia-game .mg-option-text {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(13px, 1.6vw, 16px);
+  line-height: 1.35;
+}
+
+#mischievia-game .mg-option.angel {
+  border-color: rgba(62,228,255,.85);
+  box-shadow: 0 0 20px rgba(62,228,255,.2), inset 0 0 20px rgba(62,228,255,.05);
+}
+
+#mischievia-game .mg-option.demon {
+  border-color: rgba(255,47,95,.9);
+  box-shadow: 0 0 20px rgba(255,47,95,.24), inset 0 0 20px rgba(255,47,95,.05);
+}
+
+#mischievia-game .mg-option.selected {
+  animation: mgSelected .42s ease both;
+  border-color: var(--gold);
+}
+
+/* =====================================================================
+   REVEAL SCREEN
+   ===================================================================== */
+
+#mischievia-game .mg-reveal-card {
+  position: relative;
+  width: min(840px, 100%);
+  border-radius: 28px;
+  padding: clamp(22px, 4vw, 46px);
+  text-align: center;
+}
+
+#mischievia-game .mg-stamp {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 16px;
+  color: var(--red);
+  border: 4px solid var(--red);
+  padding: 6px 16px;
+  transform: rotate(-8deg);
+  font-size: clamp(22px, 4.5vw, 48px);
+  letter-spacing: .06em;
+  text-shadow: 0 0 18px rgba(255,47,95,.5);
+  box-shadow: 0 0 20px rgba(255,47,95,.18);
+  animation: mgStamp .44s cubic-bezier(.3,1.6,.4,1) both;
+}
+
+#mischievia-game .mg-picked-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  text-align: left;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--line-bright);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin: 10px 0 16px;
+}
+
+#mischievia-game .mg-picked-letter {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  color: #12050a;
+  font-size: 20px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+#mischievia-game .mg-picked-text {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(15px, 2vw, 19px);
+  line-height: 1.4;
+  color: var(--cream);
+  padding-top: 8px;
+}
+
+#mischievia-game .mg-score-burst {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  min-height: 32px;
+}
+
+#mischievia-game .mg-score-chip {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  border-radius: 999px;
+  padding: 4px 14px;
+  border: 1px solid;
+  animation: mgChipIn .3s ease-out both;
+}
+
+#mischievia-game .mg-score-chip.mischief {
+  color: var(--red);
+  border-color: rgba(255,47,95,.4);
+  background: rgba(255,47,95,.1);
+}
+
+#mischievia-game .mg-score-chip.growth {
+  color: var(--green);
+  border-color: rgba(79,255,176,.4);
+  background: rgba(79,255,176,.1);
+}
+
+#mischievia-game .mg-score-chip.xp {
+  color: var(--gold);
+  border-color: rgba(255,200,87,.4);
+  background: rgba(255,200,87,.1);
+}
+
+#mischievia-game .mg-breakdown {
+  text-align: left;
+  background: rgba(0,0,0,.28);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#mischievia-game .mg-breakdown-row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+#mischievia-game .mg-breakdown-icon {
+  font-size: 18px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+#mischievia-game .mg-breakdown strong {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+#mischievia-game .mg-breakdown p {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 1.6vw, 16px);
+  line-height: 1.5;
+  margin: 3px 0 0;
+  color: var(--cream-soft);
+}
+
+#mischievia-game .mg-verdict-row strong { color: var(--gold); }
+#mischievia-game .mg-verdict { color: var(--gold) !important; font-weight: 900 !important; }
+
+/* =====================================================================
+   HOT SEAT SCREENS
+   ===================================================================== */
+
+#mischievia-game .mg-hotseat-panel {
+  width: min(820px, 100%);
+}
+
+#mischievia-game .mg-hotseat-header {
+  margin-bottom: 18px;
+}
+
+#mischievia-game .mg-card-preview {
+  background: rgba(0,0,0,.28);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  width: 100%;
+  text-align: left;
+}
+
+#mischievia-game .mg-card-preview p {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 1.7vw, 16px);
+  line-height: 1.5;
+  color: var(--cream-soft);
+  margin: 6px 0 0;
+}
+
+#mischievia-game .mg-predict-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+#mischievia-game .mg-predict-btn {
+  background: rgba(0,0,0,.34);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--cream);
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 8px;
+  align-items: start;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+#mischievia-game .mg-predict-btn:hover,
+#mischievia-game .mg-predict-btn:focus {
+  border-color: rgba(255,200,87,.5);
+  background: rgba(255,255,255,.09);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+#mischievia-game .mg-predict-btn.selected-predict {
+  border-color: var(--gold);
+  background: rgba(255,200,87,.1);
+  box-shadow: 0 0 16px rgba(255,200,87,.14);
+}
+
+#mischievia-game .mg-predict-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--blue), var(--gold));
+  color: #12050a;
+  font-size: 13px;
+}
+
+#mischievia-game .mg-predictor-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+#mischievia-game .mg-predictor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+#mischievia-game .mg-predictor-name { color: var(--cream-soft); }
+
+#mischievia-game .mg-predictor-pick {
+  font-size: 12px;
+  color: rgba(255,241,207,.45);
+  letter-spacing: .06em;
+}
+
+#mischievia-game .mg-predictor-pick.voted {
+  color: var(--gold);
+  font-size: 13px;
+}
+
+/* HOT SEAT REVEAL */
+#mischievia-game .mg-hotseat-reveal { text-align: center; }
+
+#mischievia-game .mg-predict-results {
+  width: 100%;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#mischievia-game .mg-predict-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  animation: mgScreenIn .3s ease-out both;
+}
+
+#mischievia-game .mg-predict-result-row.correct {
+  border-color: rgba(79,255,176,.5);
+  background: rgba(79,255,176,.07);
+  color: var(--green);
+}
+
+#mischievia-game .mg-predict-result-row.wrong {
+  border-color: rgba(255,47,95,.4);
+  background: rgba(255,47,95,.06);
+  color: rgba(255,241,207,.65);
+}
+
+/* =====================================================================
+   PASS DEVICE SCREEN
+   ===================================================================== */
+
+#mischievia-game .mg-pass-panel {
+  gap: 14px;
+}
+
+#mischievia-game .mg-pass-icon {
+  font-size: 56px;
+  animation: mgFloatSoft 2.5s ease-in-out infinite;
+}
+
+#mischievia-game .mg-pass-cover {
+  background: rgba(0,0,0,.5);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 20px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255,241,207,.5);
+  width: min(400px, 100%);
+}
+
+/* =====================================================================
+   ROUND CHECKPOINT
+   ===================================================================== */
+
+#mischievia-game .mg-report-mini {
+  width: min(400px, 100%);
+  margin: 14px auto 22px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 2;
+  color: var(--cream-soft);
+}
+
+/* =====================================================================
+   FINAL REPORT
+   ===================================================================== */
+
+#mischievia-game .mg-report {
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  gap: 0;
+}
+
+#mischievia-game .mg-report-score {
+  width: 164px;
+  height: 164px;
+  margin: 16px auto;
+  border: 2px solid rgba(255,200,87,.5);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  background:
+    radial-gradient(circle, rgba(255,200,87,.16), transparent 56%),
+    rgba(0,0,0,.28);
+  box-shadow: 0 0 44px rgba(255,106,0,.18);
+}
+
+#mischievia-game .mg-report-score span {
+  font-size: 50px;
+  color: var(--gold);
+  line-height: 1;
+}
+
+#mischievia-game .mg-report-score p {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--cream-soft);
+}
+
+#mischievia-game .mg-report-lines {
+  width: min(540px, 100%);
+  margin: 12px auto;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 1.7vw, 16px);
+  line-height: 1.6;
+  text-align: left;
+  color: var(--cream-soft);
+}
+
+#mischievia-game .mg-report-lines strong {
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 12px;
+}
+
+#mischievia-game .mg-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin: 16px 0;
+  width: 100%;
+}
+
+#mischievia-game .mg-stat {
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 11px;
+  text-align: left;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+#mischievia-game .mg-stat > span {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  font-size: 13px;
+}
+
+#mischievia-game .mg-stat-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.4);
+  overflow: hidden;
+}
+
+#mischievia-game .mg-stat-bar div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--gold), var(--red));
+  transition: width .7s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* PARTY REPORT */
+#mischievia-game .mg-party-awards {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+#mischievia-game .mg-award-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 18px;
+  text-align: left;
+  animation: mgScreenIn .3s ease-out both;
+}
+
+#mischievia-game .mg-award-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+#mischievia-game .mg-award-label {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 3px;
+}
+
+#mischievia-game .mg-award-name {
+  font-size: clamp(18px, 3vw, 28px);
+  color: var(--gold);
+  line-height: 1;
+}
+
+#mischievia-game .mg-award-sub {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--cream-soft);
+  margin-top: 2px;
+}
+
+#mischievia-game .mg-party-scoreboard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+#mischievia-game .mg-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  animation: mgScreenIn .3s ease-out both;
+}
+
+#mischievia-game .mg-score-row:first-child {
+  border-color: rgba(255,200,87,.45);
+  background: rgba(255,200,87,.08);
+}
+
+#mischievia-game .mg-score-row-rank {
+  font-size: 11px;
+  color: var(--gold);
+  margin-right: 8px;
+}
+
+#mischievia-game .mg-score-row-name { flex: 1; color: var(--cream); }
+#mischievia-game .mg-score-row-mischief { color: var(--red); font-size: 13px; }
+#mischievia-game .mg-score-row-xp { color: var(--gold); font-size: 12px; margin-left: 10px; }
+
+/* =====================================================================
+   LEVEL UP OVERLAY
+   ===================================================================== */
+
+#mischievia-game .mg-levelup-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(4px);
+}
+
+#mischievia-game .mg-levelup-overlay.active {
+  display: flex;
+  animation: mgFadeIn .2s ease-out both;
+}
+
+#mischievia-game .mg-levelup-card {
+  text-align: center;
+  position: relative;
+  padding: 40px;
+  animation: mgBounceIn .5s cubic-bezier(.3,1.6,.4,1) both;
+}
+
+#mischievia-game .mg-levelup-burst {
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,200,87,.3) 0%, transparent 65%);
+  animation: mgPulse 1.5s ease-in-out infinite;
+}
+
+#mischievia-game .mg-levelup-card h2 {
+  font-size: clamp(54px, 10vw, 100px);
+  color: var(--gold);
+  text-shadow: 0 0 44px rgba(255,200,87,.6);
+  margin-bottom: 10px;
+}
+
+#mischievia-game .mg-levelup-card p {
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  color: var(--cream-soft);
+  font-size: 18px;
+}
+
+/* =====================================================================
+   TOAST NOTIFICATION
+   ===================================================================== */
+
+#mischievia-game .mg-toast {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(10,6,18,.94);
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--cream);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform .28s ease, opacity .28s ease;
+  z-index: 60;
+  backdrop-filter: blur(12px);
+}
+
+#mischievia-game .mg-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* =====================================================================
+   ACTIONS ROW
+   ===================================================================== */
+
+#mischievia-game .mg-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* =====================================================================
+   KEYFRAMES
+   ===================================================================== */
+
+@keyframes mgPulse {
+  from { transform: scale(.94); opacity: .5; }
+  to { transform: scale(1.12); opacity: .82; }
+}
+
+@keyframes mgPulseText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .6; }
+}
+
+@keyframes mgDrift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-240px); }
+}
+
+@keyframes mgFloatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes mgScreenIn {
+  from { opacity: 0; transform: translateY(14px) scale(.982); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes mgCardIn {
+  from { opacity: 0; transform: translateY(28px) rotateX(8deg); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); }
+}
+
+@keyframes mgSelected {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.04); box-shadow: 0 0 40px rgba(255,200,87,.26); }
+  100% { transform: scale(1); }
+}
+
+@keyframes mgStamp {
+  from { opacity: 0; transform: scale(2.2) rotate(-22deg); }
+  to { opacity: 1; transform: scale(1) rotate(-8deg); }
+}
+
+@keyframes mgPowerActivate {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); box-shadow: 0 0 30px rgba(255,200,87,.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes mgEmberRise {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: .9; }
+  100% { transform: translateY(-120px) translateX(calc((var(--drift, 0) - 0.5) * 60px)) scale(.2); opacity: 0; }
+}
+
+@keyframes mgFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mgBounceIn {
+  from { opacity: 0; transform: scale(.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes mgChipIn {
+  from { opacity: 0; transform: scale(.7) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* =====================================================================
+   REDUCED MOTION
+   ===================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  #mischievia-game .mg-orb,
+  #mischievia-game .mg-particles,
+  #mischievia-game .mg-halo,
+  #mischievia-game .mg-ember {
+    animation: none !important;
+  }
+
+  #mischievia-game .mg-screen.active,
+  #mischievia-game .mg-card,
+  #mischievia-game .mg-stamp,
+  #mischievia-game .mg-levelup-card {
+    animation-duration: 0.01s !important;
+  }
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+
+@media (max-width: 720px) {
+  body { padding: 0; }
+
+  #mischievia-game {
+    border-radius: 0;
+    min-height: 100dvh;
+    width: 100%;
+  }
+
+  #mischievia-game .mg-screen {
+    min-height: 100dvh;
+    padding: 70px 16px 28px;
+  }
+
+  #mischievia-game .mg-options,
+  #mischievia-game .mg-hud,
+  #mischievia-game .mg-stat-grid,
+  #mischievia-game .mg-predict-options {
+    grid-template-columns: 1fr;
+  }
+
+  #mischievia-game .mg-mode-grid {
+    gap: 10px;
+  }
+
+  #mischievia-game .mg-hud {
+    margin-top: 10px;
+  }
+
+  #mischievia-game .mg-option {
+    min-height: auto;
+  }
+
+  #mischievia-game .mg-logo-card {
+    transform: none;
+  }
+
+  #mischievia-game .mg-powerups {
+    gap: 5px;
+  }
+
+  #mischievia-game .mg-power-label {
+    display: none;
+  }
+
+  #mischievia-game .mg-report {
+    max-height: none;
+  }
+
+  #mischievia-game .mg-stamp {
+    font-size: clamp(20px, 6vw, 34px);
+  }
+
+  #mischievia-game .mg-reveal-card {
+    padding: 18px 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  #mischievia-game .mg-mode-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

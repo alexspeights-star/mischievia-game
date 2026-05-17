@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mischievia: Saint or Sinner?</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="mischievia-game">
+    <div class="mg-bg">
+      <div class="mg-orb mg-orb-blue"></div>
+      <div class="mg-orb mg-orb-red"></div>
+      <div class="mg-particles"></div>
+      <div class="mg-grid"></div>
+      <div class="mg-embers" id="mgEmbers"></div>
+    </div>
+
+    <button class="mg-icon-btn mg-mute" id="mgMute" aria-label="Toggle sound">🔊</button>
+
+    <!-- START SCREEN -->
+    <section class="mg-screen active" id="screenStart">
+      <div class="mg-logo-card">
+        <div class="mg-halo"></div>
+        <div class="mg-horns">⌁</div>
+        <p class="mg-kicker">THE NO CHURCH ANSWER PARTY GAME</p>
+        <h1>MISCHIEVIA</h1>
+        <p class="mg-subtitle">SAINT OR SINNER?</p>
+      </div>
+      <p class="mg-tagline">Modern temptation. Fast choices. Funny roasts. Real reflection.<br>Pick what you'd actually do. No takebacks.</p>
+      <div class="mg-mode-grid">
+        <button class="mg-mode-btn" data-mode="solo" aria-label="Solo Mode">
+          <span class="mg-mode-icon">🙏</span>
+          <strong>SOLO MODE</strong>
+          <small>Test your soul</small>
+        </button>
+        <button class="mg-mode-btn mg-mode-hot" data-mode="hotseat" aria-label="Hot Seat Mode">
+          <span class="mg-mode-icon">🔥</span>
+          <strong>HOT SEAT</strong>
+          <small>Everyone guesses</small>
+        </button>
+        <button class="mg-mode-btn mg-mode-party" data-mode="party" aria-label="Party Mode">
+          <span class="mg-mode-icon">😈</span>
+          <strong>PARTY MODE</strong>
+          <small>Play with friends</small>
+        </button>
+        <button class="mg-mode-btn mg-mode-settings" data-mode="settings" aria-label="Settings">
+          <span class="mg-mode-icon">⚙️</span>
+          <strong>SETTINGS</strong>
+          <small>Customize game</small>
+        </button>
+      </div>
+      <div class="mg-rank-peek" id="rankPeek"></div>
+    </section>
+
+    <!-- SETTINGS SCREEN -->
+    <section class="mg-screen" id="screenSettings">
+      <div class="mg-panel">
+        <p class="mg-kicker">CUSTOMIZE</p>
+        <h2>Game Settings</h2>
+        <div class="mg-settings-list">
+          <label class="mg-setting-row">
+            <span>Cards per game</span>
+            <select class="mg-select" id="settingCards">
+              <option value="5">5 cards</option>
+              <option value="10" selected>10 cards</option>
+              <option value="15">15 cards</option>
+              <option value="20">20 cards</option>
+            </select>
+          </label>
+          <label class="mg-setting-row">
+            <span>Age rating</span>
+            <select class="mg-select" id="settingAge">
+              <option value="all">All ages</option>
+              <option value="teen" selected>Teen+</option>
+              <option value="adult">Adult only</option>
+            </select>
+          </label>
+          <label class="mg-setting-row">
+            <span>Sound effects</span>
+            <button class="mg-toggle" id="settingSound" data-on="true">ON</button>
+          </label>
+          <label class="mg-setting-row">
+            <span>Animations</span>
+            <button class="mg-toggle" id="settingAnim" data-on="true">ON</button>
+          </label>
+        </div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="saveSettings">Save &amp; Back</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOLO SETUP SCREEN -->
+    <section class="mg-screen" id="screenSetup">
+      <div class="mg-panel">
+        <button class="mg-back-btn" id="backFromSetup">← Back</button>
+        <p class="mg-kicker">ENTER THE ARENA</p>
+        <h2>Who's catching the conviction today?</h2>
+        <p class="mg-muted">Add a name for the Soul Report. It makes the roast more personal, obviously.</p>
+        <input class="mg-input" id="playerName" maxlength="20" placeholder="Your name" autocomplete="off" />
+        <button class="mg-btn mg-primary" id="beginGame">Begin Mischief</button>
+      </div>
+    </section>
+
+    <!-- PARTY SETUP SCREEN -->
+    <section class="mg-screen" id="screenPartySetup">
+      <div class="mg-panel">
+        <button class="mg-back-btn" id="backFromPartySetup">← Back</button>
+        <p class="mg-kicker">BUILD YOUR CREW</p>
+        <h2>Who's playing?</h2>
+        <p class="mg-muted">Add 2–10 players. The roasts get better with more people.</p>
+        <div class="mg-player-add-row">
+          <input class="mg-input mg-input-inline" id="addPlayerName" maxlength="20" placeholder="Player name" autocomplete="off" />
+          <button class="mg-btn mg-add-btn" id="addPlayer">+ Add</button>
+        </div>
+        <ul class="mg-player-list" id="playerList"></ul>
+        <div class="mg-party-options">
+          <label class="mg-setting-row">
+            <span>Randomize turn order</span>
+            <button class="mg-toggle" id="randomizeOrder" data-on="false">OFF</button>
+          </label>
+        </div>
+        <button class="mg-btn mg-primary" id="beginParty" disabled>Start Party</button>
+      </div>
+    </section>
+
+    <!-- HOT SEAT SETUP SCREEN -->
+    <section class="mg-screen" id="screenHotSeatSetup">
+      <div class="mg-panel">
+        <button class="mg-back-btn" id="backFromHotSeatSetup">← Back</button>
+        <p class="mg-kicker">BUILD YOUR CREW</p>
+        <h2>Who's in the mix?</h2>
+        <p class="mg-muted">Need at least 2 players. The hot seat rotates automatically.</p>
+        <div class="mg-player-add-row">
+          <input class="mg-input mg-input-inline" id="addHotSeatPlayer" maxlength="20" placeholder="Player name" autocomplete="off" />
+          <button class="mg-btn mg-add-btn" id="addHotSeatPlayerBtn">+ Add</button>
+        </div>
+        <ul class="mg-player-list" id="hotSeatPlayerList"></ul>
+        <button class="mg-btn mg-primary" id="beginHotSeat" disabled>Start Hot Seat</button>
+      </div>
+    </section>
+
+    <!-- PASS DEVICE SCREEN -->
+    <section class="mg-screen" id="screenPassDevice">
+      <div class="mg-panel mg-pass-panel">
+        <div class="mg-pass-icon">📱</div>
+        <p class="mg-kicker" id="passKicker">NEXT UP</p>
+        <h2 id="passPlayerName">Player Name</h2>
+        <p class="mg-muted" id="passSubtext">Pass the device to this player. Don't peek!</p>
+        <div class="mg-pass-cover" id="passCover">
+          <p>Screen hidden — pass the device face-down</p>
+        </div>
+        <button class="mg-btn mg-primary" id="passReady">I'm Ready — Show My Card</button>
+      </div>
+    </section>
+
+    <!-- GAME SCREEN -->
+    <section class="mg-screen" id="screenGame">
+      <header class="mg-hud">
+        <div class="mg-hud-item">
+          <span>Level</span>
+          <strong id="levelText">1</strong>
+        </div>
+        <div class="mg-hud-item">
+          <span>XP</span>
+          <strong id="xpText">0</strong>
+        </div>
+        <div class="mg-hud-item wide">
+          <span>Rank</span>
+          <strong id="rankText">Sunday School Intern</strong>
+        </div>
+      </header>
+
+      <div class="mg-meter-block">
+        <div class="mg-meter-label">
+          <span>Mischief Meter</span>
+          <span id="mischiefPercent">0%</span>
+        </div>
+        <div class="mg-meter">
+          <div class="mg-meter-fill" id="mischiefFill"></div>
+        </div>
+      </div>
+
+      <div class="mg-powerups" id="powerups">
+        <button class="mg-powerup" data-power="holy" aria-label="Holy Water: removes most chaotic option">
+          💧 <span class="mg-power-label">Holy Water</span> <span class="mg-power-count" id="holyCount">2</span>
+        </button>
+        <button class="mg-powerup" data-power="angel" aria-label="Guardian Angel: highlights healthiest option">
+          🪽 <span class="mg-power-label">Angel</span> <span class="mg-power-count" id="angelCount">2</span>
+        </button>
+        <button class="mg-powerup" data-power="demon" aria-label="Demon Whisper: highlights most mischievous option">
+          😈 <span class="mg-power-label">Demon</span> <span class="mg-power-count" id="demonCount">2</span>
+        </button>
+        <button class="mg-powerup" data-power="redemption" aria-label="Redemption: reduces mischief score">
+          🙏 <span class="mg-power-label">Redemption</span> <span class="mg-power-count" id="redemptionCount">1</span>
+        </button>
+        <button class="mg-powerup" data-power="double" aria-label="Double Trouble: doubles next score impact">
+          🔥 <span class="mg-power-label">Double</span> <span class="mg-power-count" id="doubleCount">1</span>
+        </button>
+        <button class="mg-powerup" data-power="confession" aria-label="Confession Card: bonus reflection">
+          📜 <span class="mg-power-label">Confess</span> <span class="mg-power-count" id="confessionCount">1</span>
+        </button>
+      </div>
+
+      <article class="mg-card" id="card">
+        <div class="mg-card-top">
+          <span id="modeBadge" class="mg-badge">Solo</span>
+          <span id="cardProgress" class="mg-progress">Card 1 / 10</span>
+        </div>
+        <h2 id="cardTitle">Card Title</h2>
+        <p id="cardScenario">Scenario text appears here.</p>
+        <div class="mg-options" id="options"></div>
+      </article>
+
+      <div class="mg-double-active" id="doubleIndicator" style="display:none">
+        🔥 DOUBLE TROUBLE ACTIVE — next answer scores 2×
+      </div>
+    </section>
+
+    <!-- REVEAL SCREEN -->
+    <section class="mg-screen" id="screenReveal">
+      <div class="mg-reveal-card">
+        <div class="mg-stamp" id="stampText">NO TAKEBACKS</div>
+        <p class="mg-kicker" id="chosenLabel">YOU PICKED</p>
+        <div class="mg-picked-answer" id="pickedAnswer">
+          <span class="mg-picked-letter" id="pickedLetter">A</span>
+          <span class="mg-picked-text" id="pickedText">Answer text</span>
+        </div>
+        <div class="mg-score-burst" id="scoreBurst"></div>
+        <div class="mg-breakdown">
+          <div class="mg-breakdown-row">
+            <span class="mg-breakdown-icon">🔍</span>
+            <div><strong>What this reveals:</strong><p id="breakdownText"></p></div>
+          </div>
+          <div class="mg-breakdown-row">
+            <span class="mg-breakdown-icon">🔥</span>
+            <div><strong>Roast:</strong><p id="roastText"></p></div>
+          </div>
+          <div class="mg-breakdown-row">
+            <span class="mg-breakdown-icon">🪞</span>
+            <div><strong>Reflection:</strong><p id="reflectionText"></p></div>
+          </div>
+          <div class="mg-breakdown-row mg-verdict-row">
+            <span class="mg-breakdown-icon">⚖️</span>
+            <div><strong>Verdict:</strong><p id="verdictText" class="mg-verdict"></p></div>
+          </div>
+        </div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="nextCard">Next Card →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOT SEAT: PREDICTION SCREEN -->
+    <section class="mg-screen" id="screenHotSeatPredict">
+      <div class="mg-panel mg-hotseat-panel">
+        <div class="mg-hotseat-header">
+          <p class="mg-kicker">🔥 HOT SEAT</p>
+          <h2><span id="hotSeatPlayerName">Jordan</span> is in the hot seat</h2>
+          <p class="mg-muted">Everyone else — what do you think they'll pick? Don't show them!</p>
+        </div>
+        <div class="mg-card-preview" id="hotSeatCardPreview">
+          <p class="mg-kicker" id="hotSeatCardTitle">Card Title</p>
+          <p id="hotSeatScenario">Scenario</p>
+        </div>
+        <div class="mg-predict-options" id="predictOptions"></div>
+        <div class="mg-predictor-list" id="predictorList"></div>
+        <button class="mg-btn mg-primary" id="hotSeatPassToPlayer">Pass to <span id="passToName">Jordan</span></button>
+      </div>
+    </section>
+
+    <!-- HOT SEAT: PLAYER ANSWERS -->
+    <section class="mg-screen" id="screenHotSeatAnswer">
+      <header class="mg-hud">
+        <div class="mg-hud-item">
+          <span>Round</span>
+          <strong id="hotSeatRound">1</strong>
+        </div>
+        <div class="mg-hud-item wide">
+          <span>Hot Seat</span>
+          <strong id="hotSeatAnswerName">Jordan</strong>
+        </div>
+        <div class="mg-hud-item">
+          <span>Card</span>
+          <strong id="hotSeatCardNum">1/10</strong>
+        </div>
+      </header>
+      <article class="mg-card" id="hotSeatCard">
+        <div class="mg-card-top">
+          <span class="mg-badge mg-badge-hot">🔥 HOT SEAT</span>
+          <span class="mg-progress" id="hotSeatProgress">Card 1 / 10</span>
+        </div>
+        <h2 id="hotSeatCardTitleAnswer">Card Title</h2>
+        <p id="hotSeatScenarioAnswer">Scenario</p>
+        <div class="mg-options" id="hotSeatOptions"></div>
+      </article>
+    </section>
+
+    <!-- HOT SEAT: REVEAL SCREEN -->
+    <section class="mg-screen" id="screenHotSeatReveal">
+      <div class="mg-reveal-card mg-hotseat-reveal">
+        <div class="mg-stamp">REVEALED</div>
+        <p class="mg-kicker">HOT SEAT RESULT</p>
+        <h2 id="hotRevealName">Jordan</h2>
+        <div class="mg-picked-answer">
+          <span class="mg-picked-letter" id="hotRevealLetter">A</span>
+          <span class="mg-picked-text" id="hotRevealText">Answer text</span>
+        </div>
+        <div class="mg-predict-results" id="predictResults"></div>
+        <div class="mg-breakdown">
+          <div class="mg-breakdown-row">
+            <span class="mg-breakdown-icon">🔥</span>
+            <div><strong>Roast:</strong><p id="hotRevealRoast"></p></div>
+          </div>
+          <div class="mg-breakdown-row">
+            <span class="mg-breakdown-icon">🪞</span>
+            <div><strong>Reflection:</strong><p id="hotRevealReflection"></p></div>
+          </div>
+        </div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="nextHotSeatCard">Next Round →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROUND CHECKPOINT -->
+    <section class="mg-screen" id="screenRound">
+      <div class="mg-panel">
+        <p class="mg-kicker">ROUND CHECKPOINT</p>
+        <h2>Still alive. Spiritually questionable, but alive.</h2>
+        <div class="mg-report-mini" id="roundStats"></div>
+        <button class="mg-btn mg-primary" id="continueRound">Keep Playing</button>
+      </div>
+    </section>
+
+    <!-- SOLO FINAL REPORT -->
+    <section class="mg-screen" id="screenReport">
+      <div class="mg-panel mg-report">
+        <p class="mg-kicker">FINAL SOUL REPORT</p>
+        <h2 id="reportName">Player Report</h2>
+        <div class="mg-report-score">
+          <span id="finalScore">0%</span>
+          <p id="finalRank">Sunday School Intern</p>
+        </div>
+        <div class="mg-report-lines">
+          <p><strong>Main pattern:</strong> <span id="mainPattern"></span></p>
+          <p><strong>Growth note:</strong> <span id="growthNote"></span></p>
+          <p><strong>Shareable result:</strong> <span id="shareText"></span></p>
+        </div>
+        <div class="mg-stat-grid" id="statGrid"></div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="restartGame">Play Again</button>
+          <button class="mg-btn mg-secondary" id="copyResult">Copy Result</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTY FINAL REPORT -->
+    <section class="mg-screen" id="screenPartyReport">
+      <div class="mg-panel mg-report">
+        <p class="mg-kicker">PARTY SOUL REPORT</p>
+        <h2>The Verdict Is In</h2>
+        <div class="mg-party-awards" id="partyAwards"></div>
+        <div class="mg-party-scoreboard" id="partyScoreboard"></div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="partyPlayAgain">Play Again</button>
+          <button class="mg-btn mg-secondary" id="partyCopyResult">Copy Results</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOT SEAT FINAL REPORT -->
+    <section class="mg-screen" id="screenHotSeatReport">
+      <div class="mg-panel mg-report">
+        <p class="mg-kicker">HOT SEAT FINAL</p>
+        <h2>Who Knows Who Best?</h2>
+        <div class="mg-party-awards" id="hotSeatAwards"></div>
+        <div class="mg-party-scoreboard" id="hotSeatScoreboard"></div>
+        <div class="mg-actions">
+          <button class="mg-btn mg-primary" id="hotSeatPlayAgain">Play Again</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEVEL UP OVERLAY -->
+    <div class="mg-levelup-overlay" id="levelUpOverlay" aria-live="polite">
+      <div class="mg-levelup-card">
+        <div class="mg-levelup-burst"></div>
+        <p class="mg-kicker">LEVEL UP</p>
+        <h2 id="levelUpText">Level 2</h2>
+        <p id="levelUpRank">Youth Group Survivor</p>
+      </div>
+    </div>
+
+    <!-- POWERUP FEEDBACK TOAST -->
+    <div class="mg-toast" id="mgToast" aria-live="assertive"></div>
+
+  </main>
+
+  <script src="cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
