@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mischievia: Saint or Sinner?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -20,12 +23,15 @@
 
     <!-- START SCREEN -->
     <section class="mg-screen active" id="screenStart">
-      <div class="mg-logo-card">
-        <div class="mg-halo"></div>
-        <div class="mg-horns">⌁</div>
-        <p class="mg-kicker">THE NO CHURCH ANSWER PARTY GAME</p>
-        <h1>MISCHIEVIA</h1>
-        <p class="mg-subtitle">SAINT OR SINNER?</p>
+      <div class="mg-logo-wrap">
+        <img src="logo.png" alt="Mischievia: Saint or Sinner?" class="mg-logo-img" onerror="this.style.display='none';document.getElementById('mgLogoFallback').style.display='flex'" />
+        <div class="mg-logo-fallback" id="mgLogoFallback">
+          <div class="mg-halo"></div>
+          <div class="mg-horns">⌁</div>
+          <p class="mg-kicker">THE NO CHURCH ANSWER PARTY GAME</p>
+          <h1>MISCHIEVIA</h1>
+          <p class="mg-subtitle">SAINT OR SINNER?</p>
+        </div>
       </div>
       <p class="mg-tagline">Modern temptation. Fast choices. Funny roasts. Real reflection.<br>Pick what you'd actually do. No takebacks.</p>
       <div class="mg-mode-grid">

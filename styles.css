@@ -44,7 +44,8 @@ body {
     linear-gradient(135deg, #030206, #16081f 48%, #070309);
   box-shadow: 0 30px 90px var(--shadow), 0 0 0 1px rgba(255,255,255,0.05);
   isolation: isolate;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", system-ui, sans-serif;
+  /* Teko = game-logo headers, Barlow Condensed = UI labels, Barlow = body copy */
+  font-family: "Teko", "Barlow Condensed", Impact, system-ui, sans-serif;
 }
 
 #mischievia-game * { box-sizing: border-box; }
@@ -168,78 +169,107 @@ body {
    LOGO / START SCREEN
    ===================================================================== */
 
-#mischievia-game .mg-logo-card {
+#mischievia-game .mg-logo-wrap {
   position: relative;
-  width: min(680px, 100%);
-  padding: clamp(22px, 4vw, 44px);
-  border-radius: 30px;
-  transform: rotate(-1.5deg);
-  margin-bottom: 28px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#mischievia-game .mg-logo-card::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  border: 2px solid rgba(255, 200, 87, .32);
-  filter: drop-shadow(0 0 18px rgba(255,200,87,.42));
-  pointer-events: none;
+#mischievia-game .mg-logo-img {
+  width: min(560px, 94vw);
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(255,130,0,.5)) drop-shadow(0 8px 24px rgba(0,0,0,.7));
+  animation: mgFloatSoft 4s ease-in-out infinite;
 }
 
+#mischievia-game .mg-logo-fallback {
+  display: none;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(20px, 4vw, 40px) clamp(24px, 5vw, 60px);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(35,16,47,.9), rgba(5,4,9,.94));
+  border: 1px solid rgba(255,200,87,.25);
+  box-shadow: 0 0 60px rgba(255,100,0,.2), 0 24px 60px rgba(0,0,0,.55);
+}
+
+/* Halo shown inside fallback only */
 #mischievia-game .mg-halo {
-  width: 160px;
-  height: 42px;
-  border: 7px solid rgba(255, 200, 87, .9);
+  width: 140px;
+  height: 38px;
+  border: 6px solid rgba(255, 200, 87, .9);
   border-radius: 50%;
-  margin: 0 auto 10px;
-  transform: perspective(260px) rotateX(58deg);
+  margin: 0 auto 8px;
+  transform: perspective(240px) rotateX(58deg);
   box-shadow: 0 0 22px rgba(255, 200, 87, .5);
   animation: mgFloatSoft 3.5s ease-in-out infinite;
 }
 
 #mischievia-game .mg-horns {
   position: absolute;
-  right: 28px;
-  top: 18px;
+  right: 22px;
+  top: 14px;
   color: var(--red);
-  font-size: 60px;
+  font-size: 52px;
   transform: rotate(20deg);
-  text-shadow: 0 0 18px rgba(255, 47, 95, .7);
+  text-shadow: 0 0 16px rgba(255, 47, 95, .7);
 }
 
+/* =====================================================================
+   HEADINGS
+   ===================================================================== */
+
 #mischievia-game h1 {
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 700;
   margin: 0;
-  font-size: clamp(58px, 12vw, 136px);
-  line-height: .78;
-  letter-spacing: -4px;
-  color: var(--gold);
-  text-shadow:
-    0 5px 0 #7a2400,
-    0 0 14px rgba(255, 200, 87, .44),
-    0 0 44px rgba(255, 106, 0, .4);
+  font-size: clamp(72px, 16vw, 160px);
+  line-height: .82;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  /* Orange-to-gold gradient matching logo */
+  background: linear-gradient(175deg, #ffe066 0%, #ffa500 40%, #ff6a00 80%, #cc2200 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 0 rgba(100,20,0,.9)) drop-shadow(0 0 30px rgba(255,140,0,.5));
+  paint-order: stroke fill;
 }
 
 #mischievia-game h2 {
-  margin: 0 0 14px;
-  font-size: clamp(28px, 5.5vw, 64px);
-  line-height: .92;
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 600;
+  margin: 0 0 12px;
+  font-size: clamp(28px, 5.5vw, 60px);
+  line-height: .95;
+  letter-spacing: .5px;
+  text-transform: uppercase;
   color: var(--cream);
-  text-shadow: 0 0 22px rgba(255,255,255,.12);
+  text-shadow: 0 2px 0 rgba(0,0,0,.8), 0 0 22px rgba(255,255,255,.12);
 }
 
 #mischievia-game h3 {
-  margin: 0 0 10px;
-  font-size: clamp(20px, 3.5vw, 36px);
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: clamp(22px, 3.5vw, 38px);
+  letter-spacing: .5px;
+  text-transform: uppercase;
   color: var(--gold);
 }
 
 #mischievia-game .mg-subtitle {
-  margin: 14px 0 0;
-  font-size: clamp(24px, 5vw, 54px);
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
+  font-weight: 900;
+  margin: 10px 0 0;
+  font-size: clamp(18px, 3.5vw, 38px);
   color: white;
-  letter-spacing: .02em;
-  text-shadow: 0 0 26px rgba(62,228,255,.36);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(62,228,255,.5), 0 2px 0 rgba(0,0,0,.8);
 }
 
 /* =====================================================================
@@ -247,32 +277,33 @@ body {
    ===================================================================== */
 
 #mischievia-game .mg-kicker {
-  margin: 0 0 10px;
-  color: var(--blue);
-  font-family: Arial, sans-serif;
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
   font-weight: 900;
-  letter-spacing: .18em;
+  margin: 0 0 8px;
+  color: var(--blue);
+  letter-spacing: .22em;
   font-size: 11px;
   text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(62,228,255,.4);
 }
 
 #mischievia-game .mg-tagline {
-  max-width: 620px;
-  margin: 0 auto 28px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
-  font-size: clamp(15px, 2vw, 19px);
-  line-height: 1.55;
+  max-width: 580px;
+  margin: 0 auto 24px;
+  font-size: clamp(14px, 1.9vw, 18px);
+  line-height: 1.6;
   color: var(--cream-soft);
 }
 
 #mischievia-game .mg-muted {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
-  font-size: clamp(14px, 1.8vw, 17px);
+  font-size: clamp(13px, 1.7vw, 16px);
   color: rgba(255, 241, 207, .6);
-  margin: 0 0 18px;
-  line-height: 1.5;
+  margin: 0 0 16px;
+  line-height: 1.55;
 }
 
 /* =====================================================================
@@ -330,24 +361,29 @@ body {
 }
 
 #mischievia-game .mg-mode-btn strong {
-  font-size: clamp(13px, 2vw, 16px);
-  letter-spacing: .06em;
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 2.2vw, 20px);
+  letter-spacing: .08em;
+  text-transform: uppercase;
   color: var(--gold);
+  text-shadow: 0 0 12px rgba(255,200,87,.3);
 }
 
 #mischievia-game .mg-mode-btn small {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
   font-weight: 700;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--cream-soft);
-  letter-spacing: .04em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 
 #mischievia-game .mg-mode-hot { border-color: rgba(255, 106, 0, .28); }
 #mischievia-game .mg-mode-party { border-color: rgba(255, 47, 95, .28); }
 
 #mischievia-game .mg-rank-peek {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   color: var(--gold);
@@ -371,10 +407,12 @@ body {
 #mischievia-game .mg-btn {
   min-height: 52px;
   border-radius: 999px;
-  padding: 13px 26px;
+  padding: 10px 28px 8px;
   text-transform: uppercase;
-  letter-spacing: .05em;
-  font-size: clamp(13px, 1.8vw, 16px);
+  letter-spacing: .1em;
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(14px, 1.9vw, 18px);
 }
 
 #mischievia-game .mg-primary {
@@ -412,7 +450,7 @@ body {
   background: none;
   border: none;
   color: var(--blue);
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 14px;
   cursor: pointer;
@@ -475,7 +513,7 @@ body {
   margin: 8px auto 18px;
   display: block;
   outline: none;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 16px;
   font-weight: 900;
 }
@@ -521,7 +559,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 10px 16px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 15px;
   animation: mgScreenIn .22s ease-out both;
@@ -565,7 +603,7 @@ body {
   border-radius: 999px;
   padding: 8px 14px;
   color: var(--cream);
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 14px;
   outline: none;
@@ -589,7 +627,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 12px 16px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 14px;
   cursor: pointer;
@@ -600,7 +638,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 6px 16px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   color: var(--cream);
@@ -642,7 +680,7 @@ body {
 #mischievia-game .mg-hud-item span,
 #mischievia-game .mg-card-top span {
   display: block;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 10px;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -651,8 +689,11 @@ body {
 }
 
 #mischievia-game .mg-hud-item strong {
-  font-size: clamp(16px, 2.8vw, 24px);
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 3vw, 28px);
   color: var(--cream);
+  line-height: 1;
 }
 
 /* =====================================================================
@@ -667,7 +708,7 @@ body {
 #mischievia-game .mg-meter-label {
   display: flex;
   justify-content: space-between;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 12px;
   font-weight: 900;
   color: var(--cream-soft);
@@ -708,10 +749,10 @@ body {
 
 #mischievia-game .mg-powerup {
   border-radius: 999px;
-  padding: 8px 12px;
-  font-family: Arial, sans-serif;
+  padding: 7px 11px;
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
   font-weight: 900;
-  font-size: 11px;
+  font-size: 12px;
   background: rgba(255,255,255,.08);
   display: flex;
   align-items: center;
@@ -742,7 +783,7 @@ body {
 }
 
 #mischievia-game .mg-double-active {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   color: var(--orange);
@@ -779,7 +820,7 @@ body {
 }
 
 #mischievia-game .mg-badge {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: .14em;
@@ -798,7 +839,7 @@ body {
 }
 
 #mischievia-game .mg-progress {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 11px;
   font-weight: 900;
   color: var(--cream-soft);
@@ -811,7 +852,7 @@ body {
 }
 
 #mischievia-game .mg-card p {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(15px, 1.9vw, 20px);
   line-height: 1.55;
@@ -873,10 +914,10 @@ body {
 }
 
 #mischievia-game .mg-option-text {
-  font-family: Arial, sans-serif;
-  font-weight: 900;
-  font-size: clamp(13px, 1.6vw, 16px);
-  line-height: 1.35;
+  font-family: "Barlow Condensed", "Barlow", Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.7vw, 17px);
+  line-height: 1.3;
 }
 
 #mischievia-game .mg-option.angel {
@@ -910,12 +951,15 @@ body {
   display: block;
   width: fit-content;
   margin: 0 auto 16px;
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 700;
   color: var(--red);
   border: 4px solid var(--red);
-  padding: 6px 16px;
+  padding: 4px 18px 0;
   transform: rotate(-8deg);
-  font-size: clamp(22px, 4.5vw, 48px);
-  letter-spacing: .06em;
+  font-size: clamp(26px, 5.5vw, 58px);
+  letter-spacing: .1em;
+  text-transform: uppercase;
   text-shadow: 0 0 18px rgba(255,47,95,.5);
   box-shadow: 0 0 20px rgba(255,47,95,.18);
   animation: mgStamp .44s cubic-bezier(.3,1.6,.4,1) both;
@@ -947,7 +991,7 @@ body {
 }
 
 #mischievia-game .mg-picked-text {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: clamp(15px, 2vw, 19px);
   line-height: 1.4;
@@ -965,7 +1009,7 @@ body {
 }
 
 #mischievia-game .mg-score-chip {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   border-radius: 999px;
@@ -1018,7 +1062,7 @@ body {
 }
 
 #mischievia-game .mg-breakdown strong {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 10px;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -1026,7 +1070,7 @@ body {
 }
 
 #mischievia-game .mg-breakdown p {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(13px, 1.6vw, 16px);
   line-height: 1.5;
@@ -1035,7 +1079,15 @@ body {
 }
 
 #mischievia-game .mg-verdict-row strong { color: var(--gold); }
-#mischievia-game .mg-verdict { color: var(--gold) !important; font-weight: 900 !important; }
+#mischievia-game .mg-verdict {
+  color: var(--gold) !important;
+  font-family: "Teko", Impact, system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  font-size: clamp(18px, 2.5vw, 24px) !important;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  text-shadow: 0 0 16px rgba(255,200,87,.4);
+}
 
 /* =====================================================================
    HOT SEAT SCREENS
@@ -1060,7 +1112,7 @@ body {
 }
 
 #mischievia-game .mg-card-preview p {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(13px, 1.7vw, 16px);
   line-height: 1.5;
@@ -1083,7 +1135,7 @@ body {
   padding: 12px 14px;
   color: var(--cream);
   cursor: pointer;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   text-align: left;
@@ -1135,7 +1187,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 8px 16px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
 }
@@ -1171,7 +1223,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 9px 18px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 13px;
   animation: mgScreenIn .3s ease-out both;
@@ -1207,7 +1259,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 14px 20px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: 13px;
   color: rgba(255,241,207,.5);
@@ -1221,7 +1273,7 @@ body {
 #mischievia-game .mg-report-mini {
   width: min(400px, 100%);
   margin: 14px auto 22px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 15px;
   line-height: 2;
@@ -1256,13 +1308,17 @@ body {
 }
 
 #mischievia-game .mg-report-score span {
-  font-size: 50px;
+  font-family: "Teko", Impact, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 58px;
   color: var(--gold);
   line-height: 1;
+  letter-spacing: 1px;
+  text-shadow: 0 0 30px rgba(255,180,0,.5);
 }
 
 #mischievia-game .mg-report-score p {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   margin: 6px 0 0;
   font-size: 11px;
@@ -1272,7 +1328,7 @@ body {
 #mischievia-game .mg-report-lines {
   width: min(540px, 100%);
   margin: 12px auto;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(13px, 1.7vw, 16px);
   line-height: 1.6;
@@ -1303,7 +1359,7 @@ body {
   border-radius: 14px;
   padding: 11px;
   text-align: left;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
 }
 
@@ -1354,7 +1410,7 @@ body {
 }
 
 #mischievia-game .mg-award-label {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: .14em;
@@ -1370,7 +1426,7 @@ body {
 }
 
 #mischievia-game .mg-award-sub {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 700;
   font-size: 12px;
   color: var(--cream-soft);
@@ -1393,7 +1449,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 10px 18px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 14px;
   animation: mgScreenIn .3s ease-out both;
@@ -1457,7 +1513,7 @@ body {
 }
 
 #mischievia-game .mg-levelup-card p {
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   color: var(--cream-soft);
   font-size: 18px;
@@ -1476,7 +1532,7 @@ body {
   border: 1px solid var(--line-bright);
   border-radius: 999px;
   padding: 12px 24px;
-  font-family: Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   font-weight: 900;
   font-size: 14px;
   color: var(--cream);
