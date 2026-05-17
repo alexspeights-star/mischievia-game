@@ -2019,3 +2019,550 @@ body {
   animation: mgRedemptionGlow .9s ease-out both;
   border-radius: 99px;
 }
+
+/* =====================================================================
+   GRUNGE NEON THEME — Full override, amplified from design spec
+   ===================================================================== */
+
+/* Re-skin variables + atmosphere */
+#mischievia-game {
+  --cream: #fff7dc;
+  --cream-soft: rgba(255, 247, 220, 0.88);
+  --gold: #ffd35b;
+  --orange: #ff6a00;
+  --red: #ff244f;
+  --blue: #29dfff;
+  --green: #4fffb0;
+  --panel: rgba(6,4,10,.90);
+  --panel-solid: #07040d;
+  --line: rgba(255,255,255,.16);
+  --line-bright: rgba(255,255,255,.34);
+
+  background:
+    radial-gradient(circle at 7%  35%, rgba(41,223,255,.34), transparent 28%),
+    radial-gradient(circle at 0%  82%, rgba(9,125,255,.20),  transparent 26%),
+    radial-gradient(circle at 96% 30%, rgba(255,36,79,.32),  transparent 30%),
+    radial-gradient(circle at 88% 84%, rgba(255,106,0,.24),  transparent 28%),
+    radial-gradient(circle at 50% 50%, rgba(100,20,160,.10), transparent 40%),
+    linear-gradient(125deg, #020104 0%, #06020a 28%, #130310 55%, #04020a 100%);
+  box-shadow:
+    0 44px 140px rgba(0,0,0,.88),
+    0 0 0 1px rgba(255,255,255,.05),
+    inset 0 0 130px rgba(0,0,0,.86);
+}
+
+/* Scanline / noise layer drifting over whole game */
+#mischievia-game::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: .20;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 22% 18%, rgba(255,255,255,.22) 0 1px, transparent 2px),
+    radial-gradient(circle at 68% 62%, rgba(255,106,0,.24) 0 1px, transparent 2px),
+    radial-gradient(circle at 38% 82%, rgba(41,223,255,.20) 0 1px, transparent 2px),
+    linear-gradient(112deg, transparent 47%, rgba(255,255,255,.06) 48%, transparent 49%);
+  background-size: auto, 86px 86px, 130px 130px, 162px 162px, 320px 320px;
+  mix-blend-mode: screen;
+  animation: mgGrungeDrift 30s linear infinite;
+}
+
+/* Heaven-left / Hell-right energy split */
+#mischievia-game::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(41,223,255,.20), transparent 34%, transparent 62%, rgba(255,72,0,.22)),
+    radial-gradient(circle at 13% 50%, rgba(41,223,255,.30), transparent 34%),
+    radial-gradient(circle at 87% 52%, rgba(255,72,0,.30), transparent 36%);
+}
+
+/* Brighter orbs */
+#mischievia-game .mg-orb-blue { background: rgba(41,223,255,.64); filter: blur(94px); }
+#mischievia-game .mg-orb-red  { background: rgba(255,74,0,.60);   filter: blur(94px); }
+
+/* Tighter perspective grid */
+#mischievia-game .mg-grid {
+  opacity: .27;
+  background-image:
+    linear-gradient(rgba(41,223,255,.058) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,106,0,.044) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* Harder glass on all shared surfaces */
+#mischievia-game .mg-logo-card,
+#mischievia-game .mg-panel,
+#mischievia-game .mg-card,
+#mischievia-game .mg-reveal-card {
+  background: linear-gradient(180deg, rgba(22,12,34,.95), rgba(3,2,8,.98));
+  border: 1px solid rgba(255,255,255,.21);
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.74),
+    0 0 0 1px rgba(255,255,255,.05),
+    inset 0 0 52px rgba(255,255,255,.03);
+}
+
+/* Scanline texture + corner lights on card surfaces via ::after */
+#mischievia-game .mg-panel,
+#mischievia-game .mg-card,
+#mischievia-game .mg-reveal-card {
+  position: relative;
+}
+
+#mischievia-game .mg-panel::after,
+#mischievia-game .mg-card::after,
+#mischievia-game .mg-reveal-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(41,223,255,.18), transparent 22%, transparent 72%, rgba(255,106,0,.20)),
+    repeating-linear-gradient(96deg, rgba(255,255,255,.026) 0 1px, transparent 1px 14px);
+  opacity: .58;
+  mix-blend-mode: screen;
+  z-index: 1;
+}
+
+/* =====================================================================
+   START SCREEN — Logo as game hero
+   ===================================================================== */
+
+#mischievia-game .mg-logo-wrap {
+  isolation: isolate;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+/* Atmospheric frame behind the logo */
+#mischievia-game .mg-logo-wrap::before {
+  content: "";
+  position: absolute;
+  width: min(1000px, 98vw);
+  height: 360px;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 5%  50%, rgba(41,223,255,.60), transparent 34%),
+    radial-gradient(circle at 95% 50%, rgba(255,74,0,.60),   transparent 36%),
+    radial-gradient(circle at 50% 50%, rgba(255,106,0,.12),  transparent 44%),
+    linear-gradient(180deg, rgba(20,8,34,.92), rgba(0,0,0,.94));
+  border: 1px solid rgba(255,211,91,.32);
+  box-shadow:
+    0 0 70px rgba(41,223,255,.22),
+    0 0 80px rgba(255,74,0,.20),
+    inset 0 0 70px rgba(0,0,0,.82);
+  clip-path: polygon(2% 0, 98% 0, 100% 16%, 99% 100%, 3% 100%, 0 84%);
+}
+
+/* The actual logo image — cinematic */
+#mischievia-game .mg-logo-img {
+  width: min(820px, 97vw);
+  filter:
+    drop-shadow(0 0 28px rgba(255,211,91,.55))
+    drop-shadow(0 14px 0  rgba(80,14,0,.84))
+    drop-shadow(0 32px 40px rgba(0,0,0,.95));
+  animation: mgLogoEntrance 1s cubic-bezier(.18,1.48,.22,1) both,
+             mgLogoPulse 5.2s ease-in-out infinite 1s;
+}
+
+/* CSS fallback logo (when logo.png not found) — matches real logo colors */
+#mischievia-game .mg-logo-fallback {
+  border-color: rgba(255,211,91,.38);
+  box-shadow:
+    0 0 52px rgba(255,106,0,.26),
+    0 0 38px rgba(41,223,255,.18),
+    0 30px 80px rgba(0,0,0,.78);
+}
+
+#mischievia-game .mg-logo-fallback h1 {
+  background: linear-gradient(175deg, #fff07a 0%, #ffa500 35%, #ff6a00 72%, #cc1800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 5px 0 rgba(100,20,0,.95))
+    drop-shadow(0 0 28px rgba(255,200,60,.55));
+}
+
+/* =====================================================================
+   MODE GRID — Arcade tiles
+   ===================================================================== */
+
+#mischievia-game .mg-mode-grid {
+  width: min(700px, 100%);
+  gap: 16px;
+}
+
+#mischievia-game .mg-mode-btn {
+  min-height: 148px;
+  background: linear-gradient(160deg, rgba(18,8,28,.96), rgba(2,1,5,.99));
+  border: 1px solid rgba(255,255,255,.21);
+  border-radius: 20px;
+  box-shadow: 0 20px 44px rgba(0,0,0,.60), inset 0 0 30px rgba(255,255,255,.024);
+  isolation: isolate;
+}
+
+#mischievia-game .mg-mode-btn:hover,
+#mischievia-game .mg-mode-btn:focus {
+  transform: translateY(-9px) scale(1.024);
+  box-shadow: 0 30px 64px rgba(0,0,0,.75), 0 0 42px rgba(255,211,91,.22);
+}
+
+#mischievia-game .mg-mode-btn[data-mode="solo"] {
+  border-color: rgba(41,223,255,.58);
+  box-shadow: 0 20px 44px rgba(0,0,0,.60), 0 0 32px rgba(41,223,255,.18),
+              inset 0 0 36px rgba(41,223,255,.048);
+}
+#mischievia-game .mg-mode-btn[data-mode="solo"]::before {
+  background: radial-gradient(circle at 50% 26%, rgba(41,223,255,.30), transparent 52%);
+  opacity: .75;
+}
+
+#mischievia-game .mg-mode-btn[data-mode="hotseat"] {
+  border-color: rgba(255,106,0,.62);
+  box-shadow: 0 20px 44px rgba(0,0,0,.60), 0 0 32px rgba(255,106,0,.18),
+              inset 0 0 36px rgba(255,106,0,.052);
+}
+#mischievia-game .mg-mode-btn[data-mode="hotseat"]::before {
+  background: radial-gradient(circle at 50% 26%, rgba(255,106,0,.32), transparent 52%),
+              radial-gradient(circle at 84% 54%, rgba(255,36,79,.24), transparent 32%);
+  opacity: .75;
+}
+
+#mischievia-game .mg-mode-btn[data-mode="party"] {
+  border-color: rgba(139,61,255,.62);
+  box-shadow: 0 20px 44px rgba(0,0,0,.60), 0 0 32px rgba(139,61,255,.18),
+              inset 0 0 36px rgba(139,61,255,.052);
+}
+#mischievia-game .mg-mode-btn[data-mode="party"]::before {
+  background: radial-gradient(circle at 50% 26%, rgba(139,61,255,.32), transparent 52%);
+  opacity: .75;
+}
+
+#mischievia-game .mg-mode-icon {
+  font-size: clamp(36px, 5.5vw, 56px);
+  filter: drop-shadow(0 0 20px rgba(255,211,91,.38));
+}
+
+#mischievia-game .mg-mode-btn strong {
+  color: var(--gold);
+  font-size: clamp(22px, 3vw, 31px);
+  text-shadow: 0 2px 0 rgba(0,0,0,.92), 0 0 22px rgba(255,211,91,.40);
+}
+
+#mischievia-game .mg-mode-btn small {
+  color: rgba(255,247,220,.80);
+}
+
+/* =====================================================================
+   HUD
+   ===================================================================== */
+
+#mischievia-game .mg-hud-item {
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.42));
+  border-color: rgba(255,255,255,.21);
+  box-shadow: 0 16px 36px rgba(0,0,0,.38), inset 0 0 24px rgba(255,255,255,.024);
+}
+
+#mischievia-game .mg-hud-item span,
+#mischievia-game .mg-card-top span {
+  color: #c4f2ff;
+  text-shadow: 0 0 12px rgba(41,223,255,.44);
+}
+
+#mischievia-game .mg-meter {
+  height: 20px;
+  border-color: rgba(255,255,255,.24);
+  box-shadow: inset 0 0 20px rgba(0,0,0,.84);
+}
+
+#mischievia-game .mg-meter-fill {
+  background: linear-gradient(90deg, #29dfff 0%, #ffd35b 46%, #ff244f 100%);
+  box-shadow: 0 0 24px rgba(255,106,0,.58), 0 0 38px rgba(255,36,79,.26);
+}
+
+/* =====================================================================
+   GAME CARD — Polygon cut, max atmosphere
+   ===================================================================== */
+
+#mischievia-game .mg-card {
+  border-radius: 24px;
+  border-color: rgba(255,255,255,.23);
+  box-shadow:
+    0 34px 96px rgba(0,0,0,.78),
+    0 0 54px rgba(255,106,0,.10),
+    inset 0 0 44px rgba(255,255,255,.024);
+  clip-path: polygon(0 2%, 98% 0, 100% 9%, 99.5% 100%, 3% 100%, 0 93%);
+}
+
+#mischievia-game .mg-card::before {
+  background:
+    linear-gradient(90deg, rgba(41,223,255,.22), transparent 22%, transparent 72%, rgba(255,106,0,.24)),
+    radial-gradient(circle at 0% 0%,   rgba(41,223,255,.15), transparent 35%),
+    radial-gradient(circle at 100% 100%, rgba(255,106,0,.15), transparent 35%);
+}
+
+/* =====================================================================
+   ANSWER OPTIONS — Per-letter neon color identity
+   ===================================================================== */
+
+#mischievia-game .mg-options { gap: 14px; }
+
+#mischievia-game .mg-option {
+  min-height: 106px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.040), rgba(0,0,0,.64));
+  border-color: rgba(255,255,255,.18);
+  box-shadow: inset 0 0 24px rgba(255,255,255,.024), 0 12px 28px rgba(0,0,0,.40);
+  overflow: hidden;
+}
+
+#mischievia-game .mg-option::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .18s ease;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255,255,255,.22), transparent 28%),
+    linear-gradient(135deg, rgba(255,255,255,.08), transparent 50%);
+  pointer-events: none;
+}
+#mischievia-game .mg-option:hover::before { opacity: 1; }
+
+#mischievia-game .mg-option:hover:not([disabled]):not(.removed) {
+  transform: translateY(-8px) rotate(-.7deg) scale(1.016);
+}
+
+/* A = Red — sinner */
+#mischievia-game .mg-option[data-label="A"],
+#mischievia-game .mg-predict-btn[data-label="A"] { border-color: rgba(255,36,79,.54); }
+#mischievia-game .mg-option[data-label="A"]:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 34px rgba(255,36,79,.30);
+}
+#mischievia-game .mg-option[data-label="A"] .mg-letter,
+#mischievia-game .mg-predict-btn[data-label="A"] .mg-predict-letter {
+  background: linear-gradient(135deg, #ff244f, #ff6a00);
+  box-shadow: 0 0 22px rgba(255,36,79,.50);
+}
+
+/* B = Gold — saint */
+#mischievia-game .mg-option[data-label="B"],
+#mischievia-game .mg-predict-btn[data-label="B"] { border-color: rgba(255,211,91,.50); }
+#mischievia-game .mg-option[data-label="B"]:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 34px rgba(255,211,91,.26);
+}
+#mischievia-game .mg-option[data-label="B"] .mg-letter,
+#mischievia-game .mg-predict-btn[data-label="B"] .mg-predict-letter {
+  background: linear-gradient(135deg, #fff07a, #d69526);
+  box-shadow: 0 0 22px rgba(255,211,91,.50);
+}
+
+/* C = Blue — chaos/divine */
+#mischievia-game .mg-option[data-label="C"],
+#mischievia-game .mg-predict-btn[data-label="C"] { border-color: rgba(41,223,255,.54); }
+#mischievia-game .mg-option[data-label="C"]:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 34px rgba(41,223,255,.28);
+}
+#mischievia-game .mg-option[data-label="C"] .mg-letter,
+#mischievia-game .mg-predict-btn[data-label="C"] .mg-predict-letter {
+  background: linear-gradient(135deg, #29dfff, #097dff);
+  box-shadow: 0 0 22px rgba(41,223,255,.50);
+}
+
+/* D = Purple — mischief */
+#mischievia-game .mg-option[data-label="D"],
+#mischievia-game .mg-predict-btn[data-label="D"] { border-color: rgba(139,61,255,.54); }
+#mischievia-game .mg-option[data-label="D"]:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 34px rgba(139,61,255,.30);
+}
+#mischievia-game .mg-option[data-label="D"] .mg-letter,
+#mischievia-game .mg-predict-btn[data-label="D"] .mg-predict-letter {
+  background: linear-gradient(135deg, #de8cff, #8b3dff);
+  box-shadow: 0 0 22px rgba(139,61,255,.50);
+}
+
+#mischievia-game .mg-letter {
+  width: 40px; height: 40px; font-size: 18px;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.28);
+}
+
+#mischievia-game .mg-option-text {
+  font-size: clamp(15px, 1.9vw, 20px);
+  color: rgba(255,247,220,.94);
+}
+
+/* =====================================================================
+   REVEAL SCREEN
+   ===================================================================== */
+
+#mischievia-game .mg-reveal-card {
+  border-radius: 24px;
+  clip-path: polygon(1% 0, 99% 2%, 100% 91%, 97% 100%, 3% 100%, 0 9%);
+  box-shadow: 0 38px 100px rgba(0,0,0,.80), 0 0 52px rgba(255,36,79,.10);
+}
+
+#mischievia-game .mg-stamp {
+  color: #ff7060;
+  border-color: #ff5050;
+  text-shadow: 0 0 24px rgba(255,36,79,.62), 0 2px 0 rgba(0,0,0,.80);
+  box-shadow: 0 0 22px rgba(255,36,79,.28), inset 0 0 22px rgba(255,36,79,.09);
+  background: rgba(255,36,79,.06);
+  filter: drop-shadow(0 18px 15px rgba(0,0,0,.50));
+}
+
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+
+#mischievia-game .mg-primary {
+  background: linear-gradient(135deg, #ffe978, #ff9a1f 52%, #d74a00);
+  color: #140604;
+  border-color: rgba(255,255,255,.22);
+  box-shadow:
+    0 14px 38px rgba(255,106,0,.32),
+    0 0 22px rgba(255,211,91,.24),
+    inset 0 -4px 0 rgba(0,0,0,.22);
+}
+
+#mischievia-game .mg-secondary {
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.42));
+  border-color: rgba(139,61,255,.42);
+  box-shadow: 0 0 22px rgba(139,61,255,.16);
+}
+
+/* =====================================================================
+   INPUTS
+   ===================================================================== */
+
+#mischievia-game .mg-input {
+  background: rgba(0,0,0,.66);
+  border-color: rgba(255,255,255,.26);
+  box-shadow: inset 0 0 26px rgba(0,0,0,.70), 0 0 24px rgba(41,223,255,.09);
+}
+
+#mischievia-game .mg-input:focus {
+  border-color: rgba(41,223,255,.90);
+  box-shadow: 0 0 32px rgba(41,223,255,.28), inset 0 0 26px rgba(0,0,0,.70);
+}
+
+/* =====================================================================
+   POWERUPS
+   ===================================================================== */
+
+#mischievia-game .mg-powerup {
+  min-height: 42px; padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(0,0,0,.44));
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 10px 26px rgba(0,0,0,.44), inset 0 0 18px rgba(255,255,255,.034);
+}
+
+#mischievia-game .mg-powerup[data-power="holy"]  {
+  border-color: rgba(41,223,255,.50); box-shadow: 0 10px 26px rgba(0,0,0,.44), 0 0 18px rgba(41,223,255,.14);
+}
+#mischievia-game .mg-powerup[data-power="angel"] {
+  border-color: rgba(194,243,255,.50); box-shadow: 0 10px 26px rgba(0,0,0,.44), 0 0 18px rgba(194,243,255,.14);
+}
+#mischievia-game .mg-powerup[data-power="demon"] {
+  border-color: rgba(255,36,79,.50);  box-shadow: 0 10px 26px rgba(0,0,0,.44), 0 0 18px rgba(255,36,79,.14);
+}
+#mischievia-game .mg-powerup[data-power="redemption"],
+#mischievia-game .mg-powerup[data-power="confession"] {
+  border-color: rgba(255,211,91,.52); box-shadow: 0 10px 26px rgba(0,0,0,.44), 0 0 18px rgba(255,211,91,.14);
+}
+
+/* =====================================================================
+   FINAL REPORT — Boss battle
+   ===================================================================== */
+
+#mischievia-game .mg-report-score {
+  width: 206px; height: 206px;
+  background:
+    radial-gradient(circle, rgba(255,211,91,.24), transparent 56%),
+    conic-gradient(from 220deg, rgba(41,223,255,.46), rgba(255,211,91,.64), rgba(255,36,79,.50), rgba(41,223,255,.46));
+  border-color: rgba(255,211,91,.75);
+  box-shadow:
+    0 0 52px rgba(255,211,91,.26),
+    0 0 76px rgba(255,106,0,.20),
+    inset 0 0 0 10px rgba(0,0,0,.68);
+}
+
+#mischievia-game .mg-report-score span {
+  color: var(--gold);
+  text-shadow: 0 3px 0 rgba(80,20,0,.85), 0 0 36px rgba(255,211,91,.64);
+}
+
+#mischievia-game .mg-stat {
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.46));
+  border-color: rgba(255,255,255,.19);
+}
+
+/* Hot seat predict buttons */
+#mischievia-game .mg-predict-btn {
+  min-height: 78px;
+  background: linear-gradient(180deg, rgba(255,255,255,.040), rgba(0,0,0,.66));
+  border-color: rgba(255,255,255,.18);
+  box-shadow: inset 0 0 20px rgba(255,255,255,.024), 0 10px 24px rgba(0,0,0,.38);
+}
+
+#mischievia-game .mg-predict-btn:hover {
+  transform: translateY(-5px) scale(1.014);
+  border-color: rgba(255,211,91,.55);
+}
+
+/* =====================================================================
+   GRUNGE + LOGO KEYFRAMES
+   ===================================================================== */
+
+@keyframes mgGrungeDrift {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-95px,-140px,0); }
+}
+
+@keyframes mgLogoEntrance {
+  0%   { opacity: 0; transform: translateY(-44px) scale(.82) rotate(-2.8deg); filter: blur(14px); }
+  50%  { opacity: 1; transform: translateY(12px) scale(1.052) rotate(.9deg);  filter: blur(0); }
+  76%  { transform: translateY(-4px) scale(1.012) rotate(-.3deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes mgLogoPulse {
+  0%,100% { transform: translateY(0) scale(1);      filter: drop-shadow(0 0 28px rgba(255,211,91,.55)) drop-shadow(0 14px 0 rgba(80,14,0,.84)) drop-shadow(0 32px 40px rgba(0,0,0,.95)); }
+  50%     { transform: translateY(-9px) scale(1.014); filter: drop-shadow(0 0 44px rgba(255,211,91,.70)) drop-shadow(0 14px 0 rgba(80,14,0,.84)) drop-shadow(0 38px 50px rgba(0,0,0,.95)); }
+}
+
+@keyframes mgGrungeSelected {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  30%  { transform: scale(1.04) rotate(-.48deg); filter: brightness(1.30); }
+  62%  { transform: scale(.99)  rotate(.24deg);  filter: brightness(1.12); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+
+/* =====================================================================
+   MOBILE — Remove clip-paths, keep atmosphere
+   ===================================================================== */
+
+@media (max-width: 720px) {
+  #mischievia-game .mg-card,
+  #mischievia-game .mg-reveal-card,
+  #mischievia-game .mg-panel { clip-path: none; border-radius: 26px; }
+
+  #mischievia-game .mg-logo-wrap::before { height: 235px; width: 99vw; }
+
+  #mischievia-game .mg-mode-grid { grid-template-columns: 1fr; gap: 12px; }
+  #mischievia-game .mg-mode-btn  { min-height: 110px; }
+  #mischievia-game .mg-logo-img  { width: min(560px, 98vw); }
+}
