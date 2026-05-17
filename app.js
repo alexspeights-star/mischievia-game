@@ -395,204 +395,35 @@ const FX = (() => {
 // =====================================================================
 
 const Music = (() => {
-  // Shared audio nodes (created once on first start)
-  let AC = null, master = null, reverbIn = null, distIn = null;
-  let playing = false, ticker = null, nextBar = 0, barIdx = 0;
+  let audio = null;
+  let playing = false;
   let vol = settings.musicVolume || 0.30;
 
-  const BPM    = 118;
-  const B      = 60 / BPM;   // one beat in seconds
-  const AHEAD  = 0.30;       // lookahead window
-  const TICK   = 75;         // scheduler poll interval (ms)
-
-  // Bass root frequencies: G2, C3, E2, D3
-  const BASS = [196.00, 130.81, 82.41, 146.83];
-
-  // Organ melody — bars × notes: [beatOffset, hzFreq, durationBeats]
-  const G4=392, A4=440, B4=493.88, C5=523.25, D5=587.33, E5=659.25;
-  const E4=329.63, Fs4=369.99, G3=196, B3=246.94;
-  const LEAD = [
-    // Bar 0 — G: upward quiz bounce
-    [[0,G4,.42],[.5,B4,.42],[1,D5,.42],[1.5,G4,.42],[2,B4,.88],[3,D5,.88]],
-    // Bar 1 — C: descending answer phrase
-    [[0,E5,.42],[.5,D5,.42],[1,C5,.42],[1.5,B4,.42],[2,A4,.88],[3,G4,.88]],
-    // Bar 2 — Em: holy minor color drop
-    [[0,E4,.42],[.75,G4,.42],[1.5,B4,.42],[2.25,A4,.42],[3,G4,.88]],
-    // Bar 3 — D: rock eighth-note build back to top
-    [[0,D5,.3],[.25,E5,.3],[.5,D5,.3],[.75,C5,.3],[1,B4,.88],[2,A4,.42],[2.5,G4,.42],[3,Fs4,.42],[3.5,G4,.42]],
-  ];
-
-  // ---- Setup (runs once) ----
-  function setup() {
-    if (AC) return true;
-    const Ctor = window.AudioContext || window.webkitAudioContext;
-    if (!Ctor) return false;
-    AC = new Ctor();
-
-    // Master bus
-    master = AC.createGain();
-    master.gain.value = vol;
-    master.connect(AC.destination);
-
-    // Reverb (impulse response — gives the "holy hall" space)
-    const conv = AC.createConvolver();
-    const len  = AC.sampleRate * 2.2;
-    const rb   = AC.createBuffer(2, len, AC.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = rb.getChannelData(ch);
-      for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 2.6);
+  function getAudio() {
+    if (!audio) {
+      audio = new Audio("music.wav");
+      audio.loop = true;
+      audio.volume = vol;
     }
-    conv.buffer = rb;
-    reverbIn = conv;
-    const rvGain = AC.createGain(); rvGain.gain.value = 0.22;
-    conv.connect(rvGain); rvGain.connect(master);
-
-    // Distortion chain (guitar/grunge bass)
-    const ws = AC.createWaveShaper();
-    const k = 190, ns = 512;
-    const curve = new Float32Array(ns);
-    for (let i = 0; i < ns; i++) {
-      const x = (i*2)/ns - 1;
-      curve[i] = (Math.PI+k)*x / (Math.PI+k*Math.abs(x));
-    }
-    ws.curve = curve; ws.oversample = '4x';
-    distIn = AC.createGain(); distIn.gain.value = 1;
-    const distOut = AC.createGain(); distOut.gain.value = 0.52;
-    distIn.connect(ws); ws.connect(distOut); distOut.connect(master);
-
-    return true;
-  }
-
-  // ---- Drum instruments ----
-  function kick(t) {
-    const o = AC.createOscillator(), g = AC.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(155, t);
-    o.frequency.exponentialRampToValueAtTime(0.01, t+.52);
-    g.gain.setValueAtTime(.92, t);
-    g.gain.exponentialRampToValueAtTime(.001, t+.52);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t+.56);
-  }
-
-  function snare(t) {
-    const dur = .2, rate = AC.sampleRate;
-    const nb = AC.createBuffer(1, Math.ceil(rate*dur), rate);
-    const nd = nb.getChannelData(0);
-    for (let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1;
-    const ns = AC.createBufferSource(); ns.buffer = nb;
-    const hp = AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1100;
-    const ng = AC.createGain();
-    ng.gain.setValueAtTime(.5,t); ng.gain.exponentialRampToValueAtTime(.001,t+dur);
-    ns.connect(hp); hp.connect(ng); ng.connect(master); ns.start(t); ns.stop(t+dur+.05);
-    const o=AC.createOscillator(), og=AC.createGain();
-    o.type='triangle'; o.frequency.value=188;
-    og.gain.setValueAtTime(.36,t); og.gain.exponentialRampToValueAtTime(.001,t+.1);
-    o.connect(og); og.connect(master); o.start(t); o.stop(t+.12);
-  }
-
-  function hat(t, open=false) {
-    const dur = open ? .24 : .04;
-    const nb = AC.createBuffer(1, Math.ceil(AC.sampleRate*(dur+.04)), AC.sampleRate);
-    const nd = nb.getChannelData(0);
-    for (let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1;
-    const ns = AC.createBufferSource(); ns.buffer = nb;
-    const bp = AC.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=9800; bp.Q.value=.6;
-    const g = AC.createGain();
-    g.gain.setValueAtTime(open?.18:.13,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
-    ns.connect(bp); bp.connect(g); g.connect(master); ns.start(t); ns.stop(t+dur+.04);
-  }
-
-  // ---- Pitched instruments ----
-  function bassNote(t, freq, dur) {
-    // Distorted power chord: root + perfect 5th
-    [freq, freq*1.498].forEach((f,i) => {
-      const o=AC.createOscillator(), g=AC.createGain();
-      o.type='sawtooth'; o.frequency.value=f;
-      const v=.2-i*.06;
-      g.gain.setValueAtTime(v,t);
-      g.gain.setValueAtTime(v*.62,t+dur*.58);
-      g.gain.exponentialRampToValueAtTime(.001,t+dur);
-      o.connect(g); g.connect(distIn); o.start(t); o.stop(t+dur);
-    });
-  }
-
-  function organNote(t, freq, dur) {
-    // Hammond drawbar simulation: sub, fundamental, 2nd octave, 3rd harmonic
-    [[.5,.014],[1,.058],[2,.030],[3,.016]].forEach(([m,v]) => {
-      const o=AC.createOscillator(), g=AC.createGain();
-      o.type='sine'; o.frequency.value=freq*m;
-      g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(v,t+.018);
-      g.gain.setValueAtTime(v,t+dur-.018);
-      g.gain.linearRampToValueAtTime(0,t+dur);
-      o.connect(g);
-      g.connect(reverbIn);  // reverb send for "holy hall" space
-      g.connect(master);    // dry signal for definition
-      o.start(t); o.stop(t+dur+.06);
-    });
-  }
-
-  // ---- Bar scheduler ----
-  function schedBar(t0, idx) {
-    const b      = idx % 4;
-    const barDur = B * 4;
-
-    // Drums — 8th note grid
-    for (let e=0; e<8; e++) {
-      const t = t0 + e * B * .5;
-      if (e===0 || e===4) kick(t);    // beats 1 & 3
-      if (e===2 || e===6) snare(t);   // beats 2 & 4
-      hat(t, e===7);                   // 8th-note hats; open on last
-    }
-
-    // Bass — full bar power chord
-    bassNote(t0, BASS[b], barDur - .05);
-
-    // Organ melody
-    LEAD[b].forEach(([beat, freq, dbeats]) => {
-      organNote(t0 + beat*B, freq, dbeats*B - .01);
-    });
-  }
-
-  function poll() {
-    if (!AC) return;
-    if (AC.state === 'suspended') AC.resume();
-    const horizon = AC.currentTime + AHEAD;
-    while (nextBar < horizon) {
-      schedBar(nextBar, barIdx);
-      nextBar += B * 4;
-      barIdx++;
-    }
+    return audio;
   }
 
   function syncBtn() {
     const btn = document.getElementById("mgMusicToggle");
     if (!btn) return;
-    btn.textContent = playing ? "🎵" : "🎵";
     btn.style.opacity = playing ? "1" : "0.38";
   }
 
   return {
     start() {
       if (playing) return;
-      if (!setup()) return;
-      if (AC.state === 'suspended') AC.resume();
-      playing = true;
-      nextBar = AC.currentTime + .1;
-      barIdx  = 0;
-      poll();
-      ticker = setInterval(poll, TICK);
-      syncBtn();
+      getAudio().play().then(() => { playing = true; syncBtn(); }).catch(() => {});
     },
 
     stop() {
-      if (!playing) return;
+      if (!playing || !audio) return;
+      audio.pause();
       playing = false;
-      clearInterval(ticker); ticker = null;
-      if (master && AC) {
-        master.gain.setTargetAtTime(0, AC.currentTime, .25);
-        setTimeout(() => { if (master) master.gain.value = vol; }, 1100);
-      }
       syncBtn();
     },
 
@@ -600,7 +431,7 @@ const Music = (() => {
 
     setVolume(v) {
       vol = Math.max(0, Math.min(1, v));
-      if (master && AC) master.gain.setTargetAtTime(vol, AC.currentTime, .05);
+      if (audio) audio.volume = vol;
       settings.musicVolume = vol;
       saveSettings();
     },
