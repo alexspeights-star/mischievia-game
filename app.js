@@ -152,46 +152,240 @@ function showScreen(name) {
 // SOUND ENGINE
 // =====================================================================
 
-function playTone(type) {
-  if (game.muted) return;
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
+const Sound = (() => {
+  let _ctx = null;
 
-  try {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+  function ctx() {
+    if (!_ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) _ctx = new AC();
+    }
+    if (_ctx && _ctx.state === "suspended") _ctx.resume();
+    return _ctx;
+  }
 
-    const configs = {
-      hover:      { freq: 360, type: "sine",     dur: 0.10, vol: 0.03 },
-      select:     { freq: 520, type: "sine",     dur: 0.18, vol: 0.05 },
-      mischief:   { freq: 90,  type: "sawtooth", dur: 0.22, vol: 0.06 },
-      power:      { freq: 640, type: "triangle", dur: 0.22, vol: 0.05 },
-      redemption: { freq: 740, type: "sine",     dur: 0.28, vol: 0.05 },
-      level:      { freq: 880, type: "sine",     dur: 0.32, vol: 0.06 },
-      stamp:      { freq: 160, type: "square",   dur: 0.14, vol: 0.04 },
-    };
+  function sweep(c, freq, type, t0, t1, vol, freqEnd) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t0);
+    if (freqEnd !== undefined) o.frequency.exponentialRampToValueAtTime(freqEnd, t1);
+    g.gain.setValueAtTime(vol, t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t1);
+    o.connect(g); g.connect(c.destination);
+    o.start(t0); o.stop(t1);
+  }
 
-    const c = configs[type] || configs.select;
-    osc.frequency.value = c.freq;
-    osc.type = c.type;
-    gain.gain.setValueAtTime(c.vol, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + c.dur);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + c.dur);
-  } catch (_) {}
-}
+  function note(c, freq, t0, dur, vol = 0.055, type = "sine") {
+    sweep(c, freq, type, t0, t0 + dur, vol);
+  }
 
-// Named sound functions (easy to swap with real audio later)
-function playHoverSound()      { playTone("hover"); }
-function playSelectSound()     { playTone("select"); }
-function playPowerupSound()    { playTone("power"); }
-function playMischiefSound()   { playTone("mischief"); }
-function playRedemptionSound() { playTone("redemption"); }
-function playLevelUpSound()    { playTone("level"); }
-function playStampSound()      { playTone("stamp"); }
+  function play(fn) {
+    if (game?.muted) return;
+    try { const c = ctx(); if (c) fn(c, c.currentTime); } catch (_) {}
+  }
+
+  return {
+    hover()      { play((c,t) => sweep(c, 680, "sine", t, t+.07, .032, 820)); },
+
+    select()     { play((c,t) => { sweep(c, 280, "sine", t, t+.14, .048, 520); sweep(c, 560, "sine", t+.04, t+.14, .022, 880); }); },
+
+    flip()       { play((c,t) => { sweep(c, 1100, "sine", t, t+.18, .04, 320); sweep(c, 420, "triangle", t+.06, t+.18, .028, 180); }); },
+
+    stamp()      { play((c,t) => { sweep(c, 90, "square", t, t+.2, .062, 55); sweep(c, 185, "square", t, t+.1, .038, 88); sweep(c, 1400, "sine", t, t+.06, .018, 380); }); },
+
+    mischief()   { play((c,t) => { sweep(c, 160, "sawtooth", t, t+.34, .068, 58); sweep(c, 55, "square", t, t+.36, .052, 38); sweep(c, 320, "sawtooth", t+.1, t+.34, .028, 75); }); },
+
+    redemption() {
+      const CHORD = [523.25, 659.25, 783.99, 1046.5];
+      play((c,t) => CHORD.forEach((f,i) => note(c, f, t + i*.1, .3, .05 - i*.006)));
+    },
+
+    levelup() {
+      const RUN = [261.63, 329.63, 392, 523.25, 659.25];
+      play((c,t) => {
+        RUN.forEach((f,i) => note(c, f, t + i*.09, .32, .058 - i*.006));
+        note(c, 1318.5, t + RUN.length*.09 + .05, .28, .04);
+      });
+    },
+
+    angel()  { play((c,t) => [1046.5,1318.5,1568].forEach((f,i) => note(c, f, t+i*.07, .4, .038-i*.005))); },
+
+    demon()  { play((c,t) => { sweep(c, 220, "sawtooth", t, t+.38, .068, 110); sweep(c, 110, "square", t+.08, t+.38, .05, 52); }); },
+
+    double() { play((c,t) => [220,440,880].forEach((f,i) => { const s=t+i*.07; sweep(c, f, "square", s, s+.15, .038, f*1.5); })); },
+
+    holywater() {
+      play((c,t) => {
+        sweep(c, 2400, "sine", t, t+.22, .038, 780);
+        sweep(c, 1600, "sine", t+.04, t+.22, .028, 580);
+        [1900, 2200, 1450].forEach((f,i) => note(c, f, t+.1+i*.06, .14, .022));
+      });
+    },
+
+    report() {
+      play((c,t) => {
+        sweep(c, 55, "square", t, t+.55, .058, 38);
+        [261.63, 329.63, 392, 523.25].forEach((f,i) => note(c, f, t+.1+i*.12, .35, .038));
+      });
+    }
+  };
+})();
+
+// Shim names used elsewhere so nothing breaks
+function playHoverSound()      { Sound.hover(); }
+function playSelectSound()     { Sound.select(); }
+function playPowerupSound()    { Sound.flip(); }
+function playMischiefSound()   { Sound.mischief(); }
+function playRedemptionSound() { Sound.redemption(); }
+function playLevelUpSound()    { Sound.levelup(); }
+function playStampSound()      { Sound.stamp(); }
+
+// =====================================================================
+// FX ENGINE
+// =====================================================================
+
+const FX = (() => {
+  function layer() { return document.getElementById("mgFxLayer"); }
+
+  function elCenter(el) {
+    const r  = el.getBoundingClientRect();
+    const gr = document.getElementById("mischievia-game").getBoundingClientRect();
+    return { x: r.left - gr.left + r.width / 2, y: r.top - gr.top + r.height / 2, w: r.width, h: r.height };
+  }
+
+  function burst(x, y, { count = 12, colors = ["#ffc857","#ff6a00","#ff2f5f"], size = 7 } = {}) {
+    if (!game.animationsOn) return;
+    const L = layer(); if (!L) return;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      p.className = "mg-particle";
+      const angle = (i / count) * 2 * Math.PI + (Math.random() - .5) * .9;
+      const dist  = 38 + Math.random() * 64;
+      p.style.cssText = `left:${x}px;top:${y}px;width:${size + Math.random()*4}px;height:${size + Math.random()*4}px;background:${colors[i % colors.length]};--px:${Math.cos(angle)*dist}px;--py:${Math.sin(angle)*dist}px;animation-duration:${.5 + Math.random()*.4}s;animation-delay:${Math.random()*.08}s`;
+      L.appendChild(p);
+      p.addEventListener("animationend", () => p.remove(), { once: true });
+    }
+  }
+
+  return {
+    shake(level = "sm") {
+      if (!game.animationsOn) return;
+      const el = document.getElementById("mischievia-game");
+      el.classList.remove("mg-shake-sm", "mg-shake-md", "mg-shake-lg");
+      void el.offsetWidth;
+      el.classList.add(`mg-shake-${level}`);
+      el.addEventListener("animationend", () => el.classList.remove("mg-shake-sm","mg-shake-md","mg-shake-lg"), { once: true });
+    },
+
+    burst(x, y, opts)    { burst(x, y, opts); },
+    burstAt(el, opts)    { if (el) { const p = elCenter(el); burst(p.x, p.y, opts); } },
+
+    holyWater(cardEl) {
+      if (!game.animationsOn || !cardEl) return;
+      const L = layer(); if (!L) return;
+      const { x, y, w, h } = elCenter(cardEl);
+      const sz = Math.max(w, h) * .82;
+
+      const splash = document.createElement("div");
+      splash.className = "mg-holy-splash";
+      splash.style.cssText = `width:${sz}px;height:${sz}px;left:${x - sz/2}px;top:${y - sz/2}px`;
+      L.appendChild(splash);
+      splash.addEventListener("animationend", () => splash.remove(), { once: true });
+
+      for (let i = 0; i < 16; i++) {
+        const d = document.createElement("div");
+        d.className = "mg-droplet";
+        const angle = (i / 16) * 2 * Math.PI;
+        const dist  = 48 + Math.random() * 52;
+        d.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(angle)*dist}px;--dy:${Math.sin(angle)*dist}px;animation-delay:${Math.random()*.1}s`;
+        L.appendChild(d);
+        d.addEventListener("animationend", () => d.remove(), { once: true });
+      }
+      burst(x, y, { count: 10, colors: ["#3ee4ff","#a8f3ff","#ffffff"], size: 5 });
+    },
+
+    angelFlyIn(targetEl) {
+      if (!game.animationsOn) return;
+      const L = layer(); if (!L) return;
+      const pos = targetEl ? elCenter(targetEl) : { x: 200, y: 200 };
+      const m = document.createElement("div");
+      m.className = "mg-mascot-angel";
+      m.textContent = "👼";
+      m.style.cssText = `left:${pos.x - 27}px;top:${pos.y - 54}px`;
+      L.appendChild(m);
+      setTimeout(() => m.classList.add("mg-floating"), 850);
+      setTimeout(() => { m.style.transition = "opacity .4s"; m.style.opacity = "0"; setTimeout(() => m.remove(), 450); }, 2600);
+    },
+
+    demonDropIn(targetEl) {
+      if (!game.animationsOn) return;
+      const L = layer(); if (!L) return;
+      const pos = targetEl ? elCenter(targetEl) : { x: 200, y: 200 };
+      const m = document.createElement("div");
+      m.className = "mg-mascot-demon";
+      m.textContent = "😈";
+      m.style.cssText = `left:${pos.x - 27}px;top:${pos.y - 54}px`;
+      L.appendChild(m);
+
+      for (let i = 0; i < 6; i++) {
+        const s = document.createElement("div");
+        s.className = "mg-smoke";
+        const angle = (i / 6) * 2 * Math.PI;
+        s.style.cssText = `left:${pos.x - 9}px;top:${pos.y - 9}px;--sx:${Math.cos(angle)*36}px;--sy:${Math.sin(angle)*36 + 8}px;animation-delay:${i*.06}s`;
+        L.appendChild(s);
+        s.addEventListener("animationend", () => s.remove(), { once: true });
+      }
+      setTimeout(() => { m.style.transition = "opacity .4s"; m.style.opacity = "0"; setTimeout(() => m.remove(), 450); }, 2600);
+    },
+
+    doubleFlash(cardEl) {
+      if (!game.animationsOn) return;
+      const el = cardEl || document.getElementById("card"); if (!el) return;
+      const f = document.createElement("div");
+      f.className = "mg-double-flash";
+      el.style.position = "relative";
+      el.appendChild(f);
+      f.addEventListener("animationend", () => f.remove(), { once: true });
+    },
+
+    redemptionSparkle() {
+      if (!game.animationsOn) return;
+      const bar = document.querySelector("#mischievia-game .mg-mischief-bar");
+      if (bar) {
+        bar.classList.remove("mg-redemption-glow");
+        void bar.offsetWidth;
+        bar.classList.add("mg-redemption-glow");
+        bar.addEventListener("animationend", () => bar.classList.remove("mg-redemption-glow"), { once: true });
+      }
+      const fill = document.getElementById("mischiefFill");
+      if (fill) { const p = elCenter(fill); burst(p.x, p.y, { count: 16, colors: ["#4fffb0","#a8ffe3","#ffffff"], size: 5 }); }
+    },
+
+    attachCardTilt(cardEl) {
+      if (!cardEl || !game.animationsOn) return;
+      function onMove(e) {
+        const r = cardEl.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width  - .5) * 2;
+        const y = ((e.clientY - r.top)  / r.height - .5) * 2;
+        cardEl.style.setProperty("--tilt-x", `${-y * 7}deg`);
+        cardEl.style.setProperty("--tilt-y", `${x * 7}deg`);
+        cardEl.classList.add("tilting");
+      }
+      function onLeave() {
+        cardEl.style.setProperty("--tilt-x", "0deg");
+        cardEl.style.setProperty("--tilt-y", "0deg");
+        cardEl.classList.remove("tilting");
+      }
+      cardEl.removeEventListener("mousemove", cardEl._tiltMove);
+      cardEl.removeEventListener("mouseleave", cardEl._tiltLeave);
+      cardEl._tiltMove  = onMove;
+      cardEl._tiltLeave = onLeave;
+      cardEl.addEventListener("mousemove", onMove);
+      cardEl.addEventListener("mouseleave", onLeave);
+    }
+  };
+})();
 
 // =====================================================================
 // TOAST
@@ -218,7 +412,8 @@ function showLevelUp(level, rank) {
   $("levelUpText").textContent = `Level ${level}`;
   $("levelUpRank").textContent = rank;
   overlay.classList.add("active");
-  playLevelUpSound();
+  Sound.levelup();
+  FX.burstAt(overlay, { count: 20, colors: ["#ffc857","#ff6a00","#4fffb0","#3ee4ff","#fff"], size: 8 });
   setTimeout(() => overlay.classList.remove("active"), 2200);
 }
 
@@ -541,12 +736,10 @@ function showPassDevice(playerName, kicker, subtext, onReady) {
   $("passSubtext").textContent = subtext || "Pass the device to this player.";
 
   const btn = $("passReady");
-  // Remove old listener by cloning
   const newBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(newBtn, newBtn);
-  const readyBtn = $("passReady");
+  btn.parentNode.replaceChild(newBtn, btn);
 
-  readyBtn.addEventListener("click", () => {
+  newBtn.addEventListener("click", () => {
     if (onReady) onReady();
     else continueAfterPass();
   });
@@ -578,6 +771,8 @@ function renderCard(player) {
     void cardEl.offsetWidth;
     cardEl.style.animation = "";
   }
+  Sound.flip();
+  FX.attachCardTilt(cardEl);
 
   $("cardProgress").textContent = `Card ${game.currentIndex + 1} / ${game.deck.length}`;
   $("cardTitle").textContent = card.title;
@@ -612,8 +807,14 @@ function chooseOption(option, buttonEl, player) {
   document.querySelectorAll("#screenGame .mg-option").forEach(b => b.style.pointerEvents = "none");
 
   buttonEl.classList.add("selected");
-  if (option.mischief >= 7) { playMischiefSound(); spawnEmbers(12); }
-  else { playSelectSound(); spawnEmbers(4); }
+  if (option.mischief >= 7) {
+    Sound.mischief(); spawnEmbers(12);
+    FX.shake("md");
+    FX.burstAt(buttonEl, { count: 16, colors: ["#ff2f5f","#ff6a00","#ffc857"] });
+  } else {
+    Sound.select(); spawnEmbers(4);
+    FX.burstAt(buttonEl, { count: 8, colors: ["#ffc857","#ff6a00","#fff"] });
+  }
 
   setTimeout(() => {
     applyChoice(option, player);
@@ -643,7 +844,8 @@ function applyChoice(option, player) {
 }
 
 function renderReveal(option, player) {
-  playStampSound();
+  Sound.stamp();
+  FX.burstAt($("pickedLetter"), { count: 14, colors: ["#ffc857","#ff6a00","#ff2f5f","#fff"] });
   $("chosenLabel").textContent = `${player.name} picked ${option.label}`;
   $("pickedLetter").textContent = option.label;
   $("pickedText").textContent = option.text;
@@ -744,11 +946,15 @@ function usePowerup(power) {
   const optionButtons = [...document.querySelectorAll("#screenGame .mg-option")];
   const options = game.selectedCard ? game.selectedCard.options : [];
 
+  const cardEl = $("card");
+
   if (power === "holy") {
     const chaotic = [...options].sort((a, b) => b.mischief - a.mischief)[0];
     const idx = options.indexOf(chaotic);
     optionButtons[idx]?.classList.add("removed");
     showToast("💧 Holy Water! Most chaotic option removed.");
+    Sound.holywater();
+    FX.holyWater(cardEl);
   }
 
   if (power === "angel") {
@@ -758,6 +964,8 @@ function usePowerup(power) {
     const idx = options.indexOf(healthiest);
     optionButtons[idx]?.classList.add("angel");
     showToast("🪽 Guardian Angel! Healthiest option highlighted.");
+    Sound.angel();
+    FX.angelFlyIn(optionButtons[idx] || cardEl);
   }
 
   if (power === "demon") {
@@ -765,31 +973,36 @@ function usePowerup(power) {
     const idx = options.indexOf(mostMischief);
     optionButtons[idx]?.classList.add("demon");
     showToast("😈 Demon Whisper! Most mischievous option revealed.");
+    Sound.demon();
+    FX.demonDropIn(optionButtons[idx] || cardEl);
   }
 
   if (power === "redemption") {
     player.mischief = Math.max(0, player.mischief - 5);
-    playRedemptionSound();
+    Sound.redemption();
+    FX.redemptionSparkle();
     updateHUD(player);
     showToast("🙏 Redemption! Mischief score reduced by 5.");
   }
 
   if (power === "double") {
     player.doubleNext = true;
+    Sound.double();
+    FX.doubleFlash(cardEl);
     updateHUD(player);
     showToast("🔥 Double Trouble! Next answer scores 2×.");
   }
 
   if (power === "confession") {
-    // Reveal breakdown text of a random option as a "bonus reflection"
     if (options.length > 0) {
       const random = options[Math.floor(Math.random() * options.length)];
       showToast(`📜 Confession Card: "${random.reflection || random.breakdown}"`, 4000);
     }
+    Sound.angel();
+    FX.burstAt(cardEl, { count: 14, colors: ["#ffc857","#fff","#3ee4ff"], size: 6 });
   }
 
   player.powerups[power] -= 1;
-  playPowerupSound();
   spawnEmbers(6);
 
   const btn = document.querySelector(`#mischievia-game .mg-powerup[data-power="${power}"]`);
@@ -1025,8 +1238,8 @@ $("hotSeatPassToPlayer").addEventListener("click", () => {
 
   const btn = $("passReady");
   const newBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(newBtn, newBtn);
-  $("passReady").addEventListener("click", showHotSeatAnswerScreen);
+  btn.parentNode.replaceChild(newBtn, btn);
+  newBtn.addEventListener("click", showHotSeatAnswerScreen);
 });
 
 function showHotSeatAnswerScreen() {
@@ -1097,7 +1310,9 @@ function hotSeatReveal(option, hotPlayer) {
     resultsEl.innerHTML = `<p style="font-family:Arial;font-weight:700;font-size:14px;color:var(--cream-soft);text-align:center">No predictions were made.</p>`;
   }
 
-  playStampSound();
+  Sound.stamp();
+  FX.burstAt($("hotRevealLetter"), { count: 14, colors: ["#ffc857","#ff6a00","#ff2f5f","#fff"] });
+  if (option.mischief >= 7) FX.shake("sm");
   showScreen("screenHotSeatReveal");
 }
 
