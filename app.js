@@ -395,17 +395,35 @@ const FX = (() => {
 // =====================================================================
 
 const Music = (() => {
+  const TRACKS = [
+    "music.wav","music 2.wav","music 3.wav","music 4.wav",
+    "music 5.wav","music6.wav","music 7.wav","music 8.wav"
+  ];
+
   let audio = null;
   let playing = false;
   let vol = settings.musicVolume || 0.30;
+  let queue = [];
 
-  function getAudio() {
-    if (!audio) {
-      audio = new Audio("music.wav");
-      audio.loop = true;
-      audio.volume = vol;
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return audio;
+    return arr;
+  }
+
+  function nextTrack() {
+    if (!queue.length) queue = shuffle([...TRACKS]);
+    return queue.pop();
+  }
+
+  function loadAndPlay(src) {
+    if (audio) { audio.pause(); audio.onended = null; }
+    audio = new Audio(src);
+    audio.volume = vol;
+    audio.onended = () => { if (playing) loadAndPlay(nextTrack()); };
+    audio.play().catch(() => {});
   }
 
   function syncBtn() {
@@ -417,12 +435,15 @@ const Music = (() => {
   return {
     start() {
       if (playing) return;
-      getAudio().play().then(() => { playing = true; syncBtn(); }).catch(() => {});
+      playing = true;
+      loadAndPlay(nextTrack());
+      syncBtn();
     },
 
     stop() {
       if (!playing || !audio) return;
       audio.pause();
+      audio.onended = null;
       playing = false;
       syncBtn();
     },
