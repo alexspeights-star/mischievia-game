@@ -22,6 +22,7 @@
     <div class="mg-fx-layer" id="mgFxLayer"></div>
     <button class="mg-icon-btn mg-music-btn" id="mgMusicToggle" aria-label="Toggle music">🎵</button>
     <button class="mg-icon-btn mg-mute" id="mgMute" aria-label="Toggle sound">🔊</button>
+    <button class="mg-icon-btn mg-fs-btn" id="mgFullscreen" aria-label="Toggle fullscreen">⛶</button>
 
     <!-- START SCREEN -->
     <section class="mg-screen active" id="screenStart">
@@ -36,6 +37,23 @@
         </div>
       </div>
       <p class="mg-tagline">Modern temptation. Fast choices. Funny roasts. Real reflection.<br>Pick what you'd actually do. No takebacks.</p>
+
+      <div class="mg-filter-row">
+        <div class="mg-filter-group">
+          <button class="mg-chip" data-age="all">All Ages</button>
+          <button class="mg-chip" data-age="teen">Teen+</button>
+          <button class="mg-chip" data-age="adult">Adult 🔞</button>
+        </div>
+        <div class="mg-filter-group">
+          <button class="mg-chip" data-cat="mix">Mix All</button>
+          <button class="mg-chip" data-cat="relationships">Relationships</button>
+          <button class="mg-chip" data-cat="social">Social Life</button>
+          <button class="mg-chip" data-cat="inner">Inner Life</button>
+          <button class="mg-chip" data-cat="spiritual">Spiritual</button>
+          <button class="mg-chip" data-cat="growth">Growth</button>
+        </div>
+      </div>
+
       <div class="mg-mode-grid">
         <button class="mg-mode-btn" data-mode="solo" aria-label="Solo Mode">
           <span class="mg-mode-icon">🙏</span>
@@ -367,7 +385,8 @@
         <div class="mg-stat-grid" id="statGrid"></div>
         <div class="mg-actions">
           <button class="mg-btn mg-primary" id="restartGame">Play Again</button>
-          <button class="mg-btn mg-secondary" id="copyResult">Copy Result</button>
+          <button class="mg-btn mg-secondary" id="shareResult">Share</button>
+          <button class="mg-btn mg-secondary" id="copyResult">Copy</button>
         </div>
       </div>
     </section>

@@ -5,7 +5,7 @@
 // =====================================================================
 
 const settings = (() => {
-  const defaults = { maxCards: 10, ageRating: "teen", sound: true, animations: true, musicOn: true, musicVolume: 0.30 };
+  const defaults = { maxCards: 10, ageRating: "teen", sound: true, animations: true, musicOn: true, musicVolume: 0.30, activeCategory: "mix" };
   try {
     return Object.assign({}, defaults, JSON.parse(localStorage.getItem("mg_settings") || "{}"));
   } catch { return { ...defaults }; }
@@ -50,6 +50,15 @@ const PARTY_AWARDS = [
   { key: "mostGossip",   icon: "👀", label: "Biggest Instigator", fn: (players) => players.reduce((a, b) => a.stats.gossip > b.stats.gossip ? a : b) }
 ];
 
+const CATEGORY_THEMES = {
+  mix:           null,
+  relationships: ["friendship","dating","situationship","relationships","family"],
+  social:        ["social-media","gossip","secret-screenshots","oversharing","cancel-culture","school"],
+  inner:         ["anxiety","insecurity","fear","anger","pride","comparison","jealousy"],
+  spiritual:     ["spiritual-growth","church-drama","forgiveness","accountability","temptation"],
+  growth:        ["people-pleasing","recovery","boundaries","workplace"]
+};
+
 // =====================================================================
 // GAME STATE
 // =====================================================================
@@ -60,6 +69,7 @@ function makePlayerState(name) {
     xp: 0,
     level: 1,
     mischief: 0,
+    maxPossibleMischief: 0,
     cardsAnswered: 0,
     doubleNext: false,
     powerups: { holy: 2, angel: 2, demon: 2, redemption: 1, double: 1, confession: 1 },
@@ -97,11 +107,16 @@ const game = {
 const $ = (id) => document.getElementById(id);
 
 function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function getMischiefPercent(player) {
-  const possible = Math.max(player.cardsAnswered * 10, 1);
+  const possible = Math.max(player.maxPossibleMischief || 1, 1);
   return Math.min(100, Math.round((player.mischief / possible) * 100));
 }
 
@@ -123,11 +138,20 @@ function getTopStat(stats) {
   return Object.entries(stats).sort((a, b) => b[1] - a[1])[0] || ["growth", 0];
 }
 
-function buildDeck() {
+function buildPool() {
   let pool = [...mischieviaCards];
   if (settings.ageRating === "teen") pool = pool.filter(c => c.ageRating !== "adult");
   if (settings.ageRating === "all")  pool = pool.filter(c => c.ageRating === "all");
-  return shuffle(pool).slice(0, settings.maxCards);
+  const cats = CATEGORY_THEMES[settings.activeCategory || "mix"];
+  if (cats) {
+    const filtered = pool.filter(c => cats.includes(c.category));
+    if (filtered.length >= 5) pool = filtered;
+  }
+  return shuffle(pool);
+}
+
+function buildDeck() {
+  return buildPool().slice(0, settings.maxCards);
 }
 
 // =====================================================================
@@ -572,6 +596,11 @@ function currentPartyPlayer() {
 // START SCREEN
 // =====================================================================
 
+function syncFilterChips() {
+  document.querySelectorAll("[data-age]").forEach(b => b.classList.toggle("mg-chip-active", b.dataset.age === settings.ageRating));
+  document.querySelectorAll("[data-cat]").forEach(b => b.classList.toggle("mg-chip-active", b.dataset.cat === (settings.activeCategory || "mix")));
+}
+
 function initStartScreen() {
   const peek = $("rankPeek");
   if (peek) {
@@ -580,6 +609,7 @@ function initStartScreen() {
       if (saved.rank) peek.textContent = `Last rank: ${saved.rank}`;
     } catch (_) {}
   }
+  syncFilterChips();
 }
 
 // =====================================================================
@@ -753,7 +783,16 @@ $("beginParty").addEventListener("click", () => {
 
   game.partyPlayers = names.map(n => makePlayerState(n));
   game.partyCurrentPlayerIndex = 0;
-  game.deck = buildDeck();
+
+  // One large shuffled pool — slice per player so nobody sees the same card twice
+  const pool = buildPool();
+  game.partyDecks = game.partyPlayers.map((_, i) => {
+    const start = i * settings.maxCards;
+    let slice = pool.slice(start, start + settings.maxCards);
+    if (slice.length < settings.maxCards) slice = [...slice, ...pool.slice(0, settings.maxCards - slice.length)];
+    return slice;
+  });
+  game.deck = game.partyDecks[0];
   game.currentIndex = 0;
 
   showPassDevice(game.partyPlayers[0].name, "FIRST UP", "Their turn to face the music.");
@@ -925,6 +964,8 @@ function applyChoice(option, player) {
   const multiplier = player.doubleNext ? 2 : 1;
   player.doubleNext = false;
 
+  const cardMax = Math.max(...game.selectedCard.options.map(o => o.mischief));
+  player.maxPossibleMischief += cardMax * multiplier;
   player.mischief += option.mischief * multiplier;
   player.cardsAnswered += 1;
   player.xp += 15 + Math.max(0, 10 - option.mischief);
@@ -992,7 +1033,7 @@ $("nextCard").addEventListener("click", () => {
         showScreen("screenPartyReport");
       } else {
         game.currentIndex = 0;
-        game.deck = buildDeck(); // fresh deck for next player
+        game.deck = game.partyDecks[game.partyCurrentPlayerIndex];
         const next = currentPartyPlayer();
         showPassDevice(next.name, "NEXT PLAYER", `Pass the device to ${next.name}.`);
       }
@@ -1132,7 +1173,7 @@ function renderSoloReport(player) {
   $("finalRank").textContent = rank;
   $("mainPattern").textContent = `${prettyTop} kept showing up like it paid rent.`;
   $("growthNote").textContent = GROWTH_NOTES[topStat] || GROWTH_NOTES.growth;
-  $("shareText").textContent = `${player.name} scored ${pct}% Mischief and ranked as "${rank}" in Mischievia: Saint or Sinner?`;
+  $("shareText").textContent = `${player.name} scored ${pct}% Mischief and ranked "${rank}" 👀 Think you can beat it? Play here: https://mischievia-game.vercel.app`;
 
   renderStatGrid("statGrid", player.stats);
 
@@ -1167,10 +1208,52 @@ $("restartGame").addEventListener("click", () => {
 
 $("copyResult").addEventListener("click", () => {
   const text = $("shareText").textContent;
-  navigator.clipboard?.writeText(text).then(() => {
-    showToast("Copied to clipboard!");
-  }).catch(() => {
-    showToast("Result: " + text);
+  navigator.clipboard?.writeText(text).then(() => showToast("Copied!")).catch(() => showToast("Result: " + text));
+});
+
+$("shareResult").addEventListener("click", () => {
+  const text = $("shareText").textContent;
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(text).then(() => showToast("Copied!")).catch(() => {});
+  }
+});
+
+// =====================================================================
+// FULLSCREEN TOGGLE
+// =====================================================================
+
+$("mgFullscreen").addEventListener("click", () => {
+  const target = document.documentElement;
+  if (!document.fullscreenElement) {
+    (target.requestFullscreen || target.webkitRequestFullscreen || target.mozRequestFullScreen).call(target).catch(() => {});
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document).catch(() => {});
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  $("mgFullscreen").textContent = document.fullscreenElement ? "⊡" : "⛶";
+});
+
+// =====================================================================
+// HOME SCREEN FILTER CHIPS (age + category)
+// =====================================================================
+
+document.querySelectorAll("[data-age]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    settings.ageRating = btn.dataset.age;
+    saveSettings();
+    syncFilterChips();
+  });
+});
+
+document.querySelectorAll("[data-cat]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    settings.activeCategory = btn.dataset.cat;
+    saveSettings();
+    syncFilterChips();
   });
 });
 

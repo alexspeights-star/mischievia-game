@@ -2613,6 +2613,57 @@ body {
 }
 
 /* =====================================================================
+   FILTER CHIPS (age + category on home screen)
+   ===================================================================== */
+
+#mischievia-game .mg-filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: min(700px, 100%);
+}
+
+#mischievia-game .mg-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+#mischievia-game .mg-chip {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  color: rgba(255,247,220,.7);
+  font-family: "Barlow Condensed", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .06em;
+  padding: 5px 13px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+#mischievia-game .mg-chip:hover {
+  background: rgba(255,211,91,.14);
+  border-color: rgba(255,211,91,.4);
+  color: var(--gold);
+}
+
+#mischievia-game .mg-chip.mg-chip-active {
+  background: rgba(255,211,91,.22);
+  border-color: rgba(255,211,91,.7);
+  color: var(--gold);
+}
+
+/* Fullscreen button */
+#mischievia-game .mg-fs-btn {
+  right: 126px;
+  font-size: 18px;
+}
+
+/* =====================================================================
    DESKTOP FULLSCREEN — fill viewport, no gap at bottom
    ===================================================================== */
 
