@@ -1721,7 +1721,6 @@ body {
   }
 
   #mischievia-game .mg-options,
-  #mischievia-game .mg-hud,
   #mischievia-game .mg-stat-grid,
   #mischievia-game .mg-predict-options {
     grid-template-columns: 1fr;
@@ -1731,8 +1730,20 @@ body {
     gap: 10px;
   }
 
+  /* HUD: keep 3-column but compact */
   #mischievia-game .mg-hud {
+    grid-template-columns: 1fr 1fr 2fr;
     margin-top: 10px;
+    gap: 6px;
+  }
+
+  #mischievia-game .mg-hud-item {
+    padding: 6px 10px;
+    border-radius: 10px;
+  }
+
+  #mischievia-game .mg-hud-item strong {
+    font-size: clamp(14px, 4vw, 20px);
   }
 
   #mischievia-game .mg-option {
@@ -1743,12 +1754,31 @@ body {
     transform: none;
   }
 
+  /* Lifeline bar: 3-across grid so all fit with labels */
   #mischievia-game .mg-powerups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
   }
 
+  #mischievia-game .mg-powerup {
+    min-height: 38px;
+    padding: 6px 8px;
+    font-size: 11px;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-align: center;
+  }
+
+  /* Show labels on mobile — small but readable */
   #mischievia-game .mg-power-label {
-    display: none;
+    display: block;
+    font-size: 9px;
+    letter-spacing: .03em;
+    opacity: .85;
   }
 
   #mischievia-game .mg-report {
